@@ -1,0 +1,16 @@
+<configuration>
+    <property resource="application.yml"/>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>false</withJansi>
+        <encoder>
+            <pattern>%cyan(%d{yyyy-MM-dd HH:mm:ss.SSS}) %green([%thread]) %green([%X{traceId}/%X{spanId}])
+                %highlight(%-5level) %magenta(%logger{36}) - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+    <logger name="io.micronaut.discovery" level="${ELog.level}"/>
+    <logger name="io.micronaut.aws" level="${ELog.level}"/>
+    <root level="${ELog.level}">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

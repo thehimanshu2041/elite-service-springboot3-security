@@ -1,0 +1,8 @@
+1. Use the following sql to create default tables :
+    * elite_user.sql
+    * elite_role.sql
+    * elite_user_role.sql
+
+2. Use the following sql to insert Default Values to elite_user, elite_role and elite_user_role :
+    * elite_user_default_values.sql
+
