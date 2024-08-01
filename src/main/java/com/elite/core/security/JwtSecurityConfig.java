@@ -1,6 +1,6 @@
 package com.elite.core.security;
 
-import com.elite.service.impl.UserDetailsServiceImpl;
+import com.elite.service.UserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,7 +25,7 @@ public class JwtSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new UserDetailsServiceImpl();
+        return new UserDetailService();
     }
 
     @Bean

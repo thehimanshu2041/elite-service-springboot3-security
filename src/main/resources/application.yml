@@ -19,7 +19,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/elite
     username: postgres
-    password: root
+    password: postgres
     driver-class-name: org.postgresql.Driver
     hikari:
       auto-commit: false
@@ -27,15 +27,8 @@ spring:
     init:
       platform: postgres
 
-log.level: INFO
-
 springdoc:
   api-docs:
     path: /swagger/api-definition
   swagger-ui:
     path: /swagger.html
-
-client:
-  api:
-    ip-info: https://api.ipify.org?format=json
-    geo-info: https://ipinfo.io/ip-address/geo

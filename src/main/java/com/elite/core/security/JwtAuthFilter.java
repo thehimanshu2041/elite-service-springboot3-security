@@ -1,6 +1,6 @@
 package com.elite.core.security;
 
-import com.elite.service.impl.UserDetailsServiceImpl;
+import com.elite.service.UserDetailService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,11 +20,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
 
-    private final UserDetailsServiceImpl userDetailsServiceImpl;
+    private final UserDetailService userDetailService;
 
-    public JwtAuthFilter(JwtService jwtService, UserDetailsServiceImpl userDetailsServiceImpl) {
+    public JwtAuthFilter(JwtService jwtService, UserDetailService userDetailService) {
         this.jwtService = jwtService;
-        this.userDetailsServiceImpl = userDetailsServiceImpl;
+        this.userDetailService = userDetailService;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         if (username != null) {
-            UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
+            UserDetails userDetails = userDetailService.loadUserByUsername(username);
             if (jwtService.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

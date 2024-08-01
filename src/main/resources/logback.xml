@@ -10,7 +10,7 @@
     </appender>
     <logger name="io.micronaut.discovery" level="${ELog.level}"/>
     <logger name="io.micronaut.aws" level="${ELog.level}"/>
-    <root level="${ELog.level}">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

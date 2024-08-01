@@ -4,7 +4,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 
 public enum ESLog implements ELog {
 
-    ES_001;
+    ES_001, ES_002;
 
     private static final String BUNDLE_NAME = "i18n.message";
 

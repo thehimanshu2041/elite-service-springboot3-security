@@ -2,8 +2,8 @@ package com.elite.controller;
 
 import com.elite.constants.WebResource;
 import com.elite.model.Login;
-import com.elite.model.UserDetail;
-import com.elite.service.UserService;
+import com.elite.model.user.UserDetail;
+import com.elite.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

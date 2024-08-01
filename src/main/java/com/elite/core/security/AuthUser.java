@@ -1,7 +1,7 @@
 package com.elite.core.security;
 
-import com.elite.entity.Role;
-import com.elite.entity.User;
+import com.elite.entity.user.Role;
+import com.elite.entity.user.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
