@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,8 +24,8 @@ import java.util.List;
 
 @Validated
 @RestController
-@RequestMapping(value = WebResource.CXT_PATH + "/config/country")
-@Tag(name = "Country api", description = "Country api")
+@RequestMapping(value = WebResource.AUTH_PATH + "/config/country")
+@Tag(name = "Country Api", description = "Country Api")
 public class CountryController {
 
     private final CountryService countryService;
@@ -44,6 +45,7 @@ public class CountryController {
                                     array = @ArraySchema(schema = @Schema(implementation = CountryDetail.class))))
             })
     @LogExecution
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @GetMapping
     public List<CountryDetail> getCountries() {
         return countryService.getCountries();
@@ -61,6 +63,7 @@ public class CountryController {
                                     schema = @Schema(implementation = CountryDetail.class)))
             })
     @LogExecution
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @GetMapping("{id}")
     public CountryDetail getCountry(@NotNull @PathVariable Long id) {
         return countryService.getCountry(id);
@@ -78,6 +81,7 @@ public class CountryController {
                                     schema = @Schema(implementation = CountryDetail.class)))
             })
     @LogExecution
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @GetMapping("code/{code}")
     public CountryDetail getCountry(@NotNull @PathVariable String code) {
         return countryService.getCountry(code);

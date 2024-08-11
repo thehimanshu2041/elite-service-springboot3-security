@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @RestController
 @RequestMapping(value = WebResource.CXT_PATH + "/auth")
-@Tag(name = "Auth api", description = "Auth api")
+@Tag(name = "Auth Api", description = "Auth Api")
 public class AuthController {
 
     private final UserService userService;

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @RestController
 @RequestMapping(value = WebResource.AUTH_PATH + "/user")
-@Tag(name = "User api", description = "User api")
+@Tag(name = "User Api", description = "User Api")
 public class UserController {
 
     private final UserService userService;
@@ -41,7 +41,7 @@ public class UserController {
                                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = UserDetail.class)))
             })
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @GetMapping
     public UserDetail getUserDetail() {
         return userService.getUserDetail();

@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +22,8 @@ import java.util.List;
 
 @Validated
 @RestController
-@RequestMapping(value = WebResource.CXT_PATH + "/config/code")
-@Tag(name = "Code api", description = "Code api")
+@RequestMapping(value = WebResource.AUTH_PATH + "/config/code")
+@Tag(name = "Code Api", description = "Code Api")
 public class CodeController {
 
     private final CodeService codeService;
@@ -42,6 +43,7 @@ public class CodeController {
                                     array = @ArraySchema(schema = @Schema(implementation = CodeDetail.class))))
             })
     @LogExecution
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @GetMapping
     public List<CodeDetail> getCodeDetails() {
         return codeService.getCodeDetails();
@@ -59,6 +61,7 @@ public class CodeController {
                                     schema = @Schema(implementation = CodeDetail.class)))
             })
     @LogExecution
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @GetMapping("{id}")
     public CodeDetail getCode(@NotNull @PathVariable Long id) {
         return codeService.getCode(id);
@@ -76,6 +79,7 @@ public class CodeController {
                                     schema = @Schema(implementation = CodeDetail.class)))
             })
     @LogExecution
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @GetMapping("code/{code}")
     public CodeDetail getCode(@NotNull @PathVariable String code) {
         return codeService.getCode(code);
@@ -92,6 +96,7 @@ public class CodeController {
                                     array = @ArraySchema(schema = @Schema(implementation = CodeDetail.class))))
             })
     @LogExecution
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @GetMapping("code-type/{id}")
     public List<CodeDetail> getCodeDetailsByType(@NotNull @PathVariable Long id) {
         return codeService.getCodeDetailsByType(id);
@@ -109,6 +114,7 @@ public class CodeController {
                                     schema = @Schema(implementation = CodeDetail.class)))
             })
     @LogExecution
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public CodeDetail createCode(@Valid @RequestBody CodeDetail codeTypeDetail) {
         return codeService.createCode(codeTypeDetail);
@@ -126,6 +132,7 @@ public class CodeController {
                                     schema = @Schema(implementation = CodeDetail.class)))
             })
     @LogExecution
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("{id}")
     public CodeDetail updateCode(@NotNull @PathVariable Long id,
                                  @Valid @RequestBody CodeDetail codeTypeDetail) {
@@ -144,6 +151,7 @@ public class CodeController {
                                     schema = @Schema(implementation = void.class)))
             })
     @LogExecution
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("{id}")
     public void deleteCode(@NotNull @PathVariable Long id) {
         codeService.deleteCode(id);
