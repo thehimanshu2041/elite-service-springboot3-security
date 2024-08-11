@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @RestController
 @RequestMapping(value = WebResource.AUTH_PATH + "/user")
-@Tag(name = "User Service", description = "User Service.")
+@Tag(name = "User api", description = "User api")
 public class UserController {
 
     private final UserService userService;
@@ -30,7 +30,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @Operation(summary = "User detail", description = "User detail", security = @SecurityRequirement(name = ApiSecuritySchemes.JWT_SECURITY_SCHEME))
+    @Operation(summary = "Get current logged in User detail", description = "Get current logged in User detail", security = @SecurityRequirement(name = ApiSecuritySchemes.JWT_SECURITY_SCHEME))
     @ApiResponses(
             value = {
                     @ApiResponse(

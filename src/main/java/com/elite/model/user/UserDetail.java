@@ -13,8 +13,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
-import java.math.BigInteger;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -65,7 +63,7 @@ public class UserDetail {
     @NotNull(message = "Phone can't be null.")
     @Schema(format = "integer", description = "Provide phone")
     @JsonProperty("phone")
-    private BigInteger phone;
+    private Long phone;
 
     @NotNull(message = "Country can't be null.")
     @Schema(format = "string", description = "Provide Country")
@@ -81,6 +79,7 @@ public class UserDetail {
     @Schema(name = "Gender detail", description = "Gender detail")
     public static class Gender {
 
+        @NotNull(message = "Gender id can't be null.")
         @Schema(format = "integer", description = "Provide id")
         @JsonProperty("id")
         private Long id;
@@ -97,35 +96,6 @@ public class UserDetail {
         @JsonProperty("description")
         private String description;
 
-        @Schema(format = "string", description = "Provide gender type")
-        @JsonProperty("genderType")
-        private GenderType genderType;
-
-        @Data
-        @Builder
-        @NoArgsConstructor
-        @AllArgsConstructor
-        @Validated
-        @JsonIgnoreProperties(ignoreUnknown = true)
-        @Schema(name = "Gender type detail", description = "Gender type detail")
-        public static class GenderType {
-            @Schema(format = "integer", description = "Provide id")
-            @JsonProperty("id")
-            private Long id;
-
-            @Schema(format = "string", description = "Provide code")
-            @JsonProperty("code")
-            private String code;
-
-            @Schema(format = "string", description = "Provide name")
-            @JsonProperty("name")
-            private String name;
-
-            @Schema(format = "string", description = "Provide code")
-            @JsonProperty("description")
-            private String description;
-        }
-
     }
 
     @Data
@@ -137,6 +107,7 @@ public class UserDetail {
     @Schema(name = "Country detail", description = "Country detail")
     public static class Country {
 
+        @NotNull(message = "Country id can't be null.")
         @Schema(format = "integer", description = "Provide id")
         @JsonProperty("id")
         private Long id;
@@ -163,7 +134,7 @@ public class UserDetail {
 
         @Schema(format = "integer", description = "Provide code")
         @JsonProperty("phoneCode")
-        private BigInteger phoneCode;
+        private Long phoneCode;
 
     }
 

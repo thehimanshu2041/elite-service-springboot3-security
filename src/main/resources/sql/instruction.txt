@@ -1,14 +1,18 @@
 *** Use the following sql to create default tables ***
-    1. elite_country.sql
-    2. elite_code_type.sql
-    3. elite_code.sql
-    4. elite_user_insert.sql
-    5. elite_role.sql
-    6. elite_user_role.sql
+    1. elite_app_setting.sql
+    2. elite_ip_address.sql
+    3. elite_country.sql
+    4. elite_code_type.sql
+    5. elite_code.sql
+    6. elite_user_insert.sql
+    7. elite_role.sql
+    8. elite_user_role.sql
+    9.elite_user_setting.sql
 
 *** Use the following sql to insert default Values ***
-    1. elite_country_insert.sql
-    2. elite_code_type_insert.sql
-    3. elite_code_insert.sql
-    4. elite_user_insert.sql
+    1. elite_app_setting_insert.sql
+    2. elite_country_insert.sql
+    3. elite_code_type_insert.sql
+    4. elite_code_insert.sql
+    5. elite_user_insert.sql
 

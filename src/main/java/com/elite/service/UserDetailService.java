@@ -3,6 +3,7 @@ package com.elite.service;
 import com.elite.core.exception.ESFault;
 import com.elite.core.exception.exceptions.NotFoundException;
 import com.elite.core.factory.MessageResource;
+import com.elite.core.log.ESLog;
 import com.elite.core.security.AuthUser;
 import com.elite.entity.user.User;
 import com.elite.repository.user.UserRepository;
@@ -22,10 +23,12 @@ public class UserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username).orElse(null);
-        if (user == null) {
-            throw new NotFoundException(MessageResource.getMessage(ESFault.ES_003));
-        }
+        log.info(MessageResource.getMessage(ESLog.ES_004), username);
+        User user = userRepository
+                .findByUsername(username)
+                .orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_003)));
+        log.info(MessageResource.getMessage(ESLog.ES_005), username);
         return new AuthUser(user);
     }
 }

@@ -2,7 +2,8 @@ package com.elite.constants;
 
 public enum EliteType {
 
-    SYSTEM_ANONYMOUS("SYSTEM_ANONYMOUS");
+    DEFAULT("DEFAULT"),
+    ANONYMOUS("ANONYMOUS");
 
     private String code;
 

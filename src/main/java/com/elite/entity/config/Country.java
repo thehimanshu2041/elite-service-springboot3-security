@@ -1,12 +1,7 @@
 package com.elite.entity.config;
 
 
-import com.elite.entity.user.User;
 import jakarta.persistence.*;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "elite_country")
@@ -34,10 +29,7 @@ public class Country {
     private String numCode;
 
     @Column(name = "country_phonecode", nullable = false)
-    private BigInteger phoneCode;
-
-    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
-    private List<User> users = new ArrayList<>();
+    private Long phoneCode;
 
     public Long getId() {
         return id;
@@ -87,19 +79,11 @@ public class Country {
         this.numCode = numCode;
     }
 
-    public BigInteger getPhoneCode() {
+    public Long getPhoneCode() {
         return phoneCode;
     }
 
-    public void setPhoneCode(BigInteger phoneCode) {
+    public void setPhoneCode(Long phoneCode) {
         this.phoneCode = phoneCode;
-    }
-
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
     }
 }

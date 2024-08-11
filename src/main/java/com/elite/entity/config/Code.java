@@ -1,15 +1,11 @@
 package com.elite.entity.config;
 
 import com.elite.core.security.AuthUserStore;
-import com.elite.entity.user.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "elite_code")
@@ -30,6 +26,10 @@ public class Code {
     @Column(name = "code_description", nullable = false)
     private String description;
 
+    // Link to CodeType Table
+    @Column(name = "code_code_type_id", nullable = false)
+    private Long codeTypeId;
+
     @Column(name = "code_created_by", nullable = false)
     private String createdBy;
 
@@ -43,14 +43,6 @@ public class Code {
     @UpdateTimestamp
     @Column(name = "code_updated_date", nullable = false)
     private Date updatedDate;
-
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "code_code_type_id")
-    private CodeType codeType;
-
-    @OneToMany(mappedBy = "gender", cascade = CascadeType.ALL)
-    private List<User> users = new ArrayList<>();
 
     @PrePersist
     private void prePersistFunction() {
@@ -97,6 +89,14 @@ public class Code {
         this.description = description;
     }
 
+    public Long getCodeTypeId() {
+        return codeTypeId;
+    }
+
+    public void setCodeTypeId(Long codeTypeId) {
+        this.codeTypeId = codeTypeId;
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
@@ -127,21 +127,5 @@ public class Code {
 
     public void setUpdatedDate(Date updatedDate) {
         this.updatedDate = updatedDate;
-    }
-
-    public CodeType getCodeType() {
-        return codeType;
-    }
-
-    public void setCodeType(CodeType codeType) {
-        this.codeType = codeType;
-    }
-
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
     }
 }

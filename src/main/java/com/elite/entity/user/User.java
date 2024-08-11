@@ -2,13 +2,10 @@ package com.elite.entity.user;
 
 
 import com.elite.core.security.AuthUserStore;
-import com.elite.entity.config.Code;
-import com.elite.entity.config.Country;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -37,19 +34,17 @@ public class User {
     @Column(name = "user_last_name", nullable = false)
     private String lastName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_gender")
-    private Code gender;
+    @Column(name = "user_gender", nullable = false)
+    private Long gender;
 
     @Column(name = "user_address", nullable = false)
     private String address;
 
     @Column(name = "user_phone", nullable = false)
-    private BigInteger phone;
+    private Long phone;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_country")
-    private Country country;
+    @Column(name = "user_country", nullable = false)
+    private Long country;
 
     @Column(name = "user_created_by", nullable = false)
     private String createdBy;
@@ -65,6 +60,7 @@ public class User {
     @Column(name = "user_updated_date", nullable = false)
     private Date updatedDate;
 
+    // Link to Role Table
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "elite_user_role",
@@ -133,11 +129,11 @@ public class User {
         this.lastName = lastName;
     }
 
-    public Code getGender() {
+    public Long getGender() {
         return gender;
     }
 
-    public void setGender(Code gender) {
+    public void setGender(Long gender) {
         this.gender = gender;
     }
 
@@ -149,19 +145,19 @@ public class User {
         this.address = address;
     }
 
-    public BigInteger getPhone() {
+    public Long getPhone() {
         return phone;
     }
 
-    public void setPhone(BigInteger phone) {
+    public void setPhone(Long phone) {
         this.phone = phone;
     }
 
-    public Country getCountry() {
+    public Long getCountry() {
         return country;
     }
 
-    public void setCountry(Country country) {
+    public void setCountry(Long country) {
         this.country = country;
     }
 

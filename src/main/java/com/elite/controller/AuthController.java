@@ -1,6 +1,7 @@
 package com.elite.controller;
 
 import com.elite.constants.WebResource;
+import com.elite.core.log.LogExecution;
 import com.elite.model.Login;
 import com.elite.model.user.UserDetail;
 import com.elite.service.user.UserService;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @RestController
 @RequestMapping(value = WebResource.CXT_PATH + "/auth")
-@Tag(name = "Auth Service", description = "Auth Service.")
+@Tag(name = "Auth api", description = "Auth api")
 public class AuthController {
 
     private final UserService userService;
@@ -42,12 +43,13 @@ public class AuthController {
                                     mediaType = MediaType.TEXT_PLAIN_VALUE,
                                     schema = @Schema(implementation = String.class)))
             })
+    @LogExecution
     @PostMapping(value = "login")
     public String login(@Valid @RequestBody Login login) {
         return userService.login(login);
     }
 
-    @Operation(summary = "User login", description = "User login")
+    @Operation(summary = "User registration", description = "User registration")
     @ApiResponses(
             value = {
                     @ApiResponse(
@@ -58,6 +60,7 @@ public class AuthController {
                                     mediaType = MediaType.ALL_VALUE,
                                     schema = @Schema(implementation = void.class)))
             })
+    @LogExecution
     @PostMapping(value = "registration")
     public void login(@Valid @RequestBody UserDetail userDetail) {
         userService.registration(userDetail);

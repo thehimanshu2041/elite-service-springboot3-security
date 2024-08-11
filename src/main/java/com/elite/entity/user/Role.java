@@ -40,6 +40,7 @@ public class Role {
     @Column(name = "role_updated_date", nullable = false)
     private Date updatedDate;
 
+    // Link to User Table
     @ManyToMany(mappedBy = "userRoles")
     private Set<User> users;
 

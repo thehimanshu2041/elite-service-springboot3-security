@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "elite_code_type")
@@ -41,9 +39,6 @@ public class CodeType {
     @UpdateTimestamp
     @Column(name = "code_type_updated_date", nullable = false)
     private Date updatedDate;
-
-    @OneToMany(mappedBy = "codeType", cascade = CascadeType.ALL)
-    private List<Code> codes = new ArrayList<>();
 
     @PrePersist
     private void prePersistFunction() {
@@ -120,13 +115,5 @@ public class CodeType {
 
     public void setUpdatedDate(Date updatedDate) {
         this.updatedDate = updatedDate;
-    }
-
-    public List<Code> getCodes() {
-        return codes;
-    }
-
-    public void setCodes(List<Code> codes) {
-        this.codes = codes;
     }
 }

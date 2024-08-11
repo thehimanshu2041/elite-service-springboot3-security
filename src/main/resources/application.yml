@@ -26,6 +26,20 @@ spring:
   sql:
     init:
       platform: postgres
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: theannapurna2041@gmail.com
+    password: ozno lktv rdbb fcbk
+    properties:
+      mail:
+        smtp:
+          auth: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+          starttls:
+            enable: true
 
 springdoc:
   api-docs:

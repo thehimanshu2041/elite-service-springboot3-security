@@ -1,6 +1,7 @@
 package com.elite.core.security;
 
 import com.elite.service.UserDetailService;
+import com.elite.service.config.IpAddressService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,9 +23,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final UserDetailService userDetailService;
 
-    public JwtAuthFilter(JwtService jwtService, UserDetailService userDetailService) {
+    private final IpAddressService ipAddressService;
+
+    public JwtAuthFilter(JwtService jwtService, UserDetailService userDetailService, IpAddressService ipAddressService) {
         this.jwtService = jwtService;
         this.userDetailService = userDetailService;
+        this.ipAddressService = ipAddressService;
     }
 
     @Override
@@ -49,6 +53,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
+        // trackUserRequest(request);
         filterChain.doFilter(request, response);
+    }
+
+    private void trackUserRequest(HttpServletRequest httpServletRequest) {
+        try {
+            ipAddressService.trackUserRequest(httpServletRequest);
+        } catch (Exception ex) {
+            System.out.println("Exception: " + ex.getMessage());
+        }
     }
 }
