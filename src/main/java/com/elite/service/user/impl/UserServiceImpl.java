@@ -24,13 +24,22 @@ import com.elite.repository.user.RoleRepository;
 import com.elite.repository.user.UserRepository;
 import com.elite.service.config.MailService;
 import com.elite.service.user.UserService;
+import com.itextpdf.html2pdf.ConverterProperties;
+import com.itextpdf.html2pdf.HtmlConverter;
+import jakarta.servlet.ServletContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 
 @Service
@@ -59,15 +68,18 @@ public class UserServiceImpl implements UserService {
 
     private final CodeMapper codeMapper;
 
-
     private final MailService mailService;
+
+    private final TemplateEngine templateEngine;
+
+    private final ServletContext servletContext;
 
     public UserServiceImpl(AuthenticationManager authenticationManager, JwtService jwtService,
                            UserRepository userRepository, RoleRepository roleRepository,
                            CodeRepository codeRepository, CountryRepository countryRepository,
                            UserSettingRepository userSettingRepository, AuthUserStore authUserStore,
                            UsersMapper usersMapper, CountryMapper countryMapper, CodeMapper codeMapper,
-                           MailService mailService) {
+                           MailService mailService, TemplateEngine templateEngine, ServletContext servletContext) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.userRepository = userRepository;
@@ -80,6 +92,8 @@ public class UserServiceImpl implements UserService {
         this.countryMapper = countryMapper;
         this.codeMapper = codeMapper;
         this.mailService = mailService;
+        this.templateEngine = templateEngine;
+        this.servletContext = servletContext;
     }
 
     @Override
@@ -151,6 +165,27 @@ public class UserServiceImpl implements UserService {
                         codeRepository.findById(user.getGender()).orElse(null)));
         log.info(MessageResource.getMessage(ESLog.ES_014));
         return userDetail;
+    }
+
+    @Override
+    public ResponseEntity<?> downloadUserDetail() {
+        byte[] bytes = null;
+        try {
+            UserDetail user = getUserDetail();
+            Context context = new Context();
+            context.setVariable("user", user);
+            String orderHtml = templateEngine.process("user-detail", context);
+            ByteArrayOutputStream target = new ByteArrayOutputStream();
+            ConverterProperties converterProperties = new ConverterProperties();
+            converterProperties.setBaseUri(servletContext.getContextPath());
+            HtmlConverter.convertToPdf(orderHtml, target, converterProperties);
+            bytes = target.toByteArray();
+        } catch (Exception ignored) {
+        }
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=user-detail.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(bytes);
     }
 
     private void createUserSetting(Long userId, String username) {

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .left, .right {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .left {
+            border-right: 2px solid #ddd;
+            padding-right: 20px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            font-size: 24px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: #4CAF50;
+        }
+
+        .info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+            margin-bottom: 10px;
+        }
+
+        .info label {
+            font-weight: bold;
+            color: #555;
+            flex-basis: 40%;
+        }
+
+        .info p {
+            margin: 0;
+            text-align: right;
+            flex-basis: 60%;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1 th:text="${user.firstName + ' ' + user.lastName}"></h1>
+    </div>
+    <div class="left">
+        <div class="section">
+            <h2>Personal Information</h2>
+            <div class="info">
+                <label for="username">Username:</label>
+                <p id="username" th:text="${user.username}"></p>
+            </div>
+            <div class="info">
+                <label for="email">Email:</label>
+                <p id="email" th:text="${user.email}"></p>
+            </div>
+            <div class="info">
+                <label for="first_name">First Name:</label>
+                <p id="first_name" th:text="${user.firstName}"></p>
+            </div>
+            <div class="info">
+                <label for="last_name">Last Name:</label>
+                <p id="last_name" th:text="${user.lastName}"></p>
+            </div>
+            <div class="info">
+                <label for="gender">Gender:</label>
+                <p id="gender" th:text="${user.gender.id}"></p>
+            </div>
+            <div class="info">
+                <label for="address">Address:</label>
+                <p id="address" th:text="${user.address}"></p>
+            </div>
+            <div class="info">
+                <label for="phone">Phone:</label>
+                <p id="phone"
+                   th:text="${(user.country != null ? '+' + user.country.phoneCode + '-' : '') + user.phone}"></p>
+            </div>
+        </div>
+    </div>
+    <div class="right">
+        <div class="section">
+            <h2>Country Information</h2>
+            <div class="info">
+                <label for="country_name">Country:</label>
+                <p id="country_name" th:text="${user.country != null ? user.country.niceName : ''}"></p>
+            </div>
+            <div class="info">
+                <label for="iso3">ISO3:</label>
+                <p id="iso3" th:text="${user.country != null ? user.country.iso3 : ''}"></p>
+            </div>
+            <div class="info">
+                <label for="phoneCode">Phone Code:</label>
+                <p id="phoneCode" th:text="${user.country != null ? '+' + user.country.phoneCode : ''}"></p>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Additional Information</h2>
+            <div class="info">
+                <label for="additional_info">Additional Info:</label>
+                <p id="additional_info">N/A</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    ©2024 Elite.
+</div>
+</body>
+</html>
