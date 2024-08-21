@@ -14,6 +14,8 @@ public interface CodeService {
 
     List<CodeDetail> getCodeDetailsByType(Long id);
 
+    List<CodeDetail> getCodeDetailsByType(String code);
+
     CodeDetail createCode(CodeDetail codeTypeDetail);
 
     CodeDetail updateCode(Long id, CodeDetail codeTypeDetail);

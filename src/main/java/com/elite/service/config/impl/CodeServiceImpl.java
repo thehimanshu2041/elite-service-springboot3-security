@@ -5,6 +5,7 @@ import com.elite.core.exception.exceptions.NotFoundException;
 import com.elite.core.factory.MessageResource;
 import com.elite.core.log.ESLog;
 import com.elite.entity.config.Code;
+import com.elite.entity.config.CodeType;
 import com.elite.mapper.config.CodeMapper;
 import com.elite.model.config.CodeDetail;
 import com.elite.repository.config.CodeRepository;
@@ -79,9 +80,18 @@ public class CodeServiceImpl implements CodeService {
     }
 
     @Override
-    public CodeDetail createCode(CodeDetail codeTypeDetail) {
-        log.info(MessageResource.getMessage(ESLog.ES_030), codeTypeDetail.getCode(), codeTypeDetail.getCodeTypeId());
-        codeTypeRepository.findById(codeTypeDetail.getCodeTypeId())
+    public List<CodeDetail> getCodeDetailsByType(String code) {
+        log.info(MessageResource.getMessage(ESLog.ES_029), code);
+        CodeType codeType = codeTypeRepository.findByCode(code)
+                .orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_009)));
+        return getCodeDetailsByType(codeType.getId());
+    }
+
+    @Override
+    public CodeDetail createCode(CodeDetail codeDetail) {
+        log.info(MessageResource.getMessage(ESLog.ES_030), codeDetail.getCode(), codeDetail.getCodeTypeId());
+        codeTypeRepository.findById(codeDetail.getCodeTypeId())
                 .orElseThrow(() ->
                         new NotFoundException(MessageResource.getMessage(ESFault.ES_009)));
         return codeMapper
@@ -89,17 +99,18 @@ public class CodeServiceImpl implements CodeService {
                         codeRepository
                                 .save(
                                         codeMapper
-                                                .toCode(codeTypeDetail)));
+                                                .toCode(codeDetail)));
     }
 
     @Override
-    public CodeDetail updateCode(Long id, CodeDetail codeTypeDetail) {
-        log.info(MessageResource.getMessage(ESLog.ES_031), id, codeTypeDetail.getCode());
-        codeRepository.findById(id)
+    public CodeDetail updateCode(Long id, CodeDetail codeDetail) {
+        log.info(MessageResource.getMessage(ESLog.ES_031), id, codeDetail.getCode());
+        Code code = codeRepository.findById(id)
                 .orElseThrow(() ->
                         new NotFoundException(MessageResource.getMessage(ESFault.ES_010)));
-        Code code = codeMapper.toCode(codeTypeDetail);
-        code.setId(id);
+        code.setCode(codeDetail.getCode());
+        code.setName(codeDetail.getName());
+        code.setDescription(codeDetail.getDescription());
         return codeMapper
                 .toCodeDetail(
                         codeRepository

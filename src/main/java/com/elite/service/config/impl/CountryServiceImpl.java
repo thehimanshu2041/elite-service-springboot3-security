@@ -5,11 +5,15 @@ import com.elite.core.exception.ESFault;
 import com.elite.core.exception.exceptions.NotFoundException;
 import com.elite.core.factory.MessageResource;
 import com.elite.core.log.ESLog;
+import com.elite.entity.config.Country;
 import com.elite.mapper.config.CountryMapper;
 import com.elite.model.config.CountryDetail;
 import com.elite.repository.config.CountryRepository;
 import com.elite.service.config.CountryService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -48,6 +52,14 @@ public class CountryServiceImpl implements CountryService {
             cacheStoreList.add(COUNTRY_CACHE, countries);
         }
         return countries;
+    }
+
+    @Override
+    public Page<CountryDetail> searchCountries(String name, int pageIndex, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<Country> countries = countryRepository.findByNiceNameContainingIgnoreCase(name, pageRequest);
+        List<CountryDetail> countryDetails = countries.getContent().stream().map(countryMapper::toCountryDetail).toList();
+        return new PageImpl<>(countryDetails, pageRequest, countries.getTotalElements());
     }
 
     @Override

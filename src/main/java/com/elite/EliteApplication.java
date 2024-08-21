@@ -25,7 +25,10 @@ public class EliteApplication {
 
             @Override
             public void addCorsMappings(CorsRegistry reg) {
-                reg.addMapping("/**").allowedOrigins("*");
+                reg.addMapping("/**")
+                        .allowedOrigins("*")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        .allowedHeaders("*");
             }
         };
     }

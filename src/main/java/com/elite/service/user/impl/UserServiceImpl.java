@@ -103,14 +103,14 @@ public class UserServiceImpl implements UserService {
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()));
         if (authentication.isAuthenticated()) {
             log.info(MessageResource.getMessage(ESLog.ES_007), login.getUsername());
-            return jwtService.generateToken(login.getUsername());
+            return jwtService.generateToken(authentication);
         } else {
             throw new ServiceException(MessageResource.getMessage(ESFault.ES_002));
         }
     }
 
     @Override
-    public void registration(UserDetail userDetail) {
+    public boolean registration(UserDetail userDetail) {
         log.info(MessageResource.getMessage(ESLog.ES_008), userDetail.getUsername());
         if (null != userRepository
                 .findByUsername(userDetail.getUsername())
@@ -147,6 +147,7 @@ public class UserServiceImpl implements UserService {
         log.info(MessageResource.getMessage(ESLog.ES_009), userDetail.getUsername());
         createUserSetting(user.getId(), user.getUsername());
         sendWelcomeUserRegisterEmail(user.getEmail(), user.getUsername());
+        return true;
     }
 
     @Override
@@ -180,7 +181,8 @@ public class UserServiceImpl implements UserService {
             converterProperties.setBaseUri(servletContext.getContextPath());
             HtmlConverter.convertToPdf(orderHtml, target, converterProperties);
             bytes = target.toByteArray();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=user-detail.pdf")

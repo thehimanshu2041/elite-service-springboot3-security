@@ -10,7 +10,7 @@ public interface UserService {
 
     String login(Login login);
 
-    void registration(UserDetail userDetail);
+    boolean registration(UserDetail userDetail);
 
     UserDetail getUserDetail();
 

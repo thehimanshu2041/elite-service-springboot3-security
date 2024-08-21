@@ -102,6 +102,23 @@ public class CodeController {
         return codeService.getCodeDetailsByType(id);
     }
 
+    @Operation(summary = "Get code list by code", description = "Get code list by code")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Operation Successful",
+                            content =
+                            @Content(
+                                    array = @ArraySchema(schema = @Schema(implementation = CodeDetail.class))))
+            })
+    @LogExecution
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    @GetMapping("code-type/code/{code}")
+    public List<CodeDetail> getCodeDetailsByType(@NotNull @PathVariable String code) {
+        return codeService.getCodeDetailsByType(code);
+    }
+
     @Operation(summary = "Save code", description = "Save code")
     @ApiResponses(
             value = {

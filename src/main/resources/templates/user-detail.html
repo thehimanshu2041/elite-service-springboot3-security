@@ -91,39 +91,39 @@
 
 <div class="container">
     <div class="header">
-        <h1 th:text="${user.firstName + ' ' + user.lastName}"></h1>
+        <h1 th:text="${user?.firstName + ' ' + user?.lastName}"></h1>
     </div>
     <div class="left">
         <div class="section">
             <h2>Personal Information</h2>
             <div class="info">
                 <label for="username">Username:</label>
-                <p id="username" th:text="${user.username}"></p>
+                <p id="username" th:text="${user?.username}"></p>
             </div>
             <div class="info">
                 <label for="email">Email:</label>
-                <p id="email" th:text="${user.email}"></p>
+                <p id="email" th:text="${user?.email}"></p>
             </div>
             <div class="info">
                 <label for="first_name">First Name:</label>
-                <p id="first_name" th:text="${user.firstName}"></p>
+                <p id="first_name" th:text="${user?.firstName}"></p>
             </div>
             <div class="info">
                 <label for="last_name">Last Name:</label>
-                <p id="last_name" th:text="${user.lastName}"></p>
+                <p id="last_name" th:text="${user?.lastName}"></p>
             </div>
             <div class="info">
                 <label for="gender">Gender:</label>
-                <p id="gender" th:text="${user.gender.id}"></p>
+                <p id="gender" th:text="${user?.gender?.id}"></p>
             </div>
             <div class="info">
                 <label for="address">Address:</label>
-                <p id="address" th:text="${user.address}"></p>
+                <p id="address" th:text="${user?.address}"></p>
             </div>
             <div class="info">
                 <label for="phone">Phone:</label>
                 <p id="phone"
-                   th:text="${(user.country != null ? '+' + user.country.phoneCode + '-' : '') + user.phone}"></p>
+                   th:text="${(user?.country != null ? '+' + user?.country?.phoneCode + '-' : '') + user?.phone}"></p>
             </div>
         </div>
     </div>
@@ -132,15 +132,15 @@
             <h2>Country Information</h2>
             <div class="info">
                 <label for="country_name">Country:</label>
-                <p id="country_name" th:text="${user.country != null ? user.country.niceName : ''}"></p>
+                <p id="country_name" th:text="${user?.country != null ? user?.country?.niceName : ''}"></p>
             </div>
             <div class="info">
                 <label for="iso3">ISO3:</label>
-                <p id="iso3" th:text="${user.country != null ? user.country.iso3 : ''}"></p>
+                <p id="iso3" th:text="${user?.country != null ? user?.country?.iso3 : ''}"></p>
             </div>
             <div class="info">
                 <label for="phoneCode">Phone Code:</label>
-                <p id="phoneCode" th:text="${user.country != null ? '+' + user.country.phoneCode : ''}"></p>
+                <p id="phoneCode" th:text="${user?.country != null ? '+' + user?.country?.phoneCode : ''}"></p>
             </div>
         </div>
         <div class="section">

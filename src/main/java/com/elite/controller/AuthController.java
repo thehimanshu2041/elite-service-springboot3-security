@@ -58,11 +58,11 @@ public class AuthController {
                             content =
                             @Content(
                                     mediaType = MediaType.ALL_VALUE,
-                                    schema = @Schema(implementation = void.class)))
+                                    schema = @Schema(implementation = Boolean.class)))
             })
     @LogExecution
     @PostMapping(value = "registration")
-    public void login(@Valid @RequestBody UserDetail userDetail) {
-        userService.registration(userDetail);
+    public boolean registration(@Valid @RequestBody UserDetail userDetail) {
+        return userService.registration(userDetail);
     }
 }

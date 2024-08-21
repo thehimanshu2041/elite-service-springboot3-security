@@ -11,12 +11,14 @@ import com.elite.model.config.CodeTypeDetail;
 import com.elite.repository.config.CodeRepository;
 import com.elite.repository.config.CodeTypeRepository;
 import com.elite.service.config.CodeTypeService;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Transactional
 @Service
 @Slf4j
 public class CodeTypeServiceImpl implements CodeTypeService {
@@ -79,12 +81,13 @@ public class CodeTypeServiceImpl implements CodeTypeService {
     @Override
     public CodeTypeDetail updateCodeType(Long id, CodeTypeDetail codeTypeDetail) {
         log.info(MessageResource.getMessage(ESLog.ES_024), id, codeTypeDetail.getCode());
-        codeTypeRepository
+        CodeType codeType = codeTypeRepository
                 .findById(id)
                 .orElseThrow(() ->
                         new NotFoundException(MessageResource.getMessage(ESFault.ES_009)));
-        CodeType codeType = codeTypeMapper.toCodeType(codeTypeDetail);
-        codeType.setId(id);
+        codeType.setCode(codeTypeDetail.getCode());
+        codeType.setName(codeTypeDetail.getName());
+        codeType.setDescription(codeTypeDetail.getDescription());
         return codeTypeMapper
                 .toCodeTypeDetail(
                         codeTypeRepository
