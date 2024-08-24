@@ -28,6 +28,9 @@ import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.html2pdf.HtmlConverter;
 import jakarta.servlet.ServletContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +44,7 @@ import org.thymeleaf.context.Context;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -125,23 +129,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = new User();
-        user.setUsername(userDetail.getUsername());
-        user.setEmail(userDetail.getEmail());
-        user.setPassword(BCrypt.hashpw(userDetail.getPassword(), BCrypt.gensalt()));
-        user.setFirstName(userDetail.getFirstName());
-        user.setLastName(userDetail.getLastName());
-        user.setAddress(userDetail.getAddress());
-        user.setPhone(userDetail.getPhone());
-
-        Code gender = codeRepository
-                .findById(userDetail.getGender().getId()).orElseThrow(() ->
-                        new NotFoundException(MessageResource.getMessage(ESFault.ES_007)));
-        Country country = countryRepository
-                .findById(userDetail.getCountry().getId()).orElseThrow(() ->
-                        new NotFoundException(MessageResource.getMessage(ESFault.ES_008)));
-
-        user.setGender(gender.getId());
-        user.setCountry(country.getId());
+        convertUserDetailToUser(userDetail, user);
         user.setUserRoles(roleRepository.findAllByNameIn(Collections.singletonList(RoleType.USER)));
         user = userRepository.save(user);
         log.info(MessageResource.getMessage(ESLog.ES_009), userDetail.getUsername());
@@ -157,15 +145,40 @@ public class UserServiceImpl implements UserService {
                 .findByUsername(authUserStore.getLoggedInUser())
                 .orElseThrow(() ->
                         new NotFoundException(MessageResource.getMessage(ESFault.ES_003)));
-        UserDetail userDetail = usersMapper.toUserDetail(user);
-        userDetail.setCountry(
-                countryMapper.toUserDetailCountry(
-                        countryRepository.findById(user.getCountry()).orElse(null)));
-        userDetail.setGender(
-                codeMapper.toUserDetailGender(
-                        codeRepository.findById(user.getGender()).orElse(null)));
         log.info(MessageResource.getMessage(ESLog.ES_014));
-        return userDetail;
+        return convertUserToUserDetail(user);
+    }
+
+    @Override
+    public UserDetail getUserDetail(Long id) {
+        log.info(MessageResource.getMessage(ESLog.ES_013));
+        User user = userRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_003)));
+        log.info(MessageResource.getMessage(ESLog.ES_014));
+        return convertUserToUserDetail(user);
+    }
+
+    @Override
+    public Page<UserDetail> searchUserDetail(String searchTerm, int pageIndex, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<User> users = userRepository.findByUsernameContainingIgnoreCase(searchTerm, pageRequest);
+        List<UserDetail> userDetails = users.getContent().stream().map(this::convertUserToUserDetail).toList();
+        return new PageImpl<>(userDetails, pageRequest, users.getTotalElements());
+    }
+
+    @Override
+    public UserDetail updateUserDetail(Long id, UserDetail userDetail) {
+        log.info(MessageResource.getMessage(ESLog.ES_033));
+        User user = userRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_003)));
+        convertUserDetailToUser(userDetail, user);
+        User updatedUser = userRepository.save(user);
+        log.info(MessageResource.getMessage(ESLog.ES_034));
+        return convertUserToUserDetail(updatedUser);
     }
 
     @Override
@@ -182,7 +195,7 @@ public class UserServiceImpl implements UserService {
             HtmlConverter.convertToPdf(orderHtml, target, converterProperties);
             bytes = target.toByteArray();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=user-detail.pdf")
@@ -214,5 +227,35 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             log.error(MessageResource.getMessage(ESFault.ES_006), username, e.getMessage());
         }
+    }
+
+    private void convertUserDetailToUser(UserDetail userDetail, User user) {
+        user.setUsername(userDetail.getUsername());
+        user.setEmail(userDetail.getEmail());
+        user.setPassword(BCrypt.hashpw(userDetail.getPassword(), BCrypt.gensalt()));
+        user.setFirstName(userDetail.getFirstName());
+        user.setLastName(userDetail.getLastName());
+        user.setAddress(userDetail.getAddress());
+        user.setPhone(userDetail.getPhone());
+        Code gender = codeRepository
+                .findById(userDetail.getGender().getId()).orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_007)));
+        Country country = countryRepository
+                .findById(userDetail.getCountry().getId()).orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_008)));
+        user.setGender(gender.getId());
+        user.setCountry(country.getId());
+    }
+
+    private UserDetail convertUserToUserDetail(User user) {
+        UserDetail userDetail = usersMapper.toUserDetail(user);
+        userDetail.setId(user.getId());
+        userDetail.setCountry(
+                countryMapper.toUserDetailCountry(
+                        countryRepository.findById(user.getCountry()).orElse(null)));
+        userDetail.setGender(
+                codeMapper.toUserDetailGender(
+                        codeRepository.findById(user.getGender()).orElse(null)));
+        return userDetail;
     }
 }

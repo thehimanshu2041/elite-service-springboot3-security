@@ -1,6 +1,7 @@
 package com.elite.service.config;
 
 import com.elite.model.config.CodeDetail;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -19,6 +20,12 @@ public interface CodeService {
     CodeDetail createCode(CodeDetail codeTypeDetail);
 
     CodeDetail updateCode(Long id, CodeDetail codeTypeDetail);
+
+    Page<CodeDetail> searchCodeDetails(String searchTerm, int pageIndex, int pageSize);
+
+    Page<CodeDetail> searchCodeDetailsByType(Long id, String searchTerm, int pageIndex, int pageSize);
+
+    Page<CodeDetail> searchCodeDetailsByType(String code, String searchTerm, int pageIndex, int pageSize);
 
     void deleteCode(Long id);
 }

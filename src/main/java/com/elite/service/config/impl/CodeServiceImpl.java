@@ -12,6 +12,9 @@ import com.elite.repository.config.CodeRepository;
 import com.elite.repository.config.CodeTypeRepository;
 import com.elite.service.config.CodeService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -115,6 +118,33 @@ public class CodeServiceImpl implements CodeService {
                 .toCodeDetail(
                         codeRepository
                                 .save(code));
+    }
+
+    @Override
+    public Page<CodeDetail> searchCodeDetails(String searchTerm, int pageIndex, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<Code> codes = codeRepository.findByNameContainingIgnoreCase(searchTerm, pageRequest);
+        List<CodeDetail> codeDetails = codes.getContent().stream().map(codeMapper::toCodeDetail).toList();
+        return new PageImpl<>(codeDetails, pageRequest, codes.getTotalElements());
+    }
+
+    @Override
+    public Page<CodeDetail> searchCodeDetailsByType(Long id, String searchTerm, int pageIndex, int pageSize) {
+        codeTypeRepository.findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_009)));
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<Code> codes = codeRepository.findByCodeTypeIdAndNameContainingIgnoreCase(id, searchTerm, pageRequest);
+        List<CodeDetail> codeDetails = codes.getContent().stream().map(codeMapper::toCodeDetail).toList();
+        return new PageImpl<>(codeDetails, pageRequest, codes.getTotalElements());
+    }
+
+    @Override
+    public Page<CodeDetail> searchCodeDetailsByType(String code, String searchTerm, int pageIndex, int pageSize) {
+        CodeType codeType = codeTypeRepository.findByCode(code)
+                .orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_009)));
+        return searchCodeDetailsByType(codeType.getId(), searchTerm, pageIndex, pageSize);
     }
 
     @Override

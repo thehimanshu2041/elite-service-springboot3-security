@@ -50,7 +50,7 @@ public class CountryController {
         return countryService.getCountries();
     }
 
-    @Operation(summary = "Search country list", description = "Search country list")
+    @Operation(summary = "Search country details", description = "Search country details")
     @ApiResponses(
             value = {
                     @ApiResponse(
@@ -63,10 +63,10 @@ public class CountryController {
     @LogExecution
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @GetMapping("/search")
-    public Page<CountryDetail> searchCountries(@Nullable @RequestParam String name,
+    public Page<CountryDetail> searchCountries(@Nullable @RequestParam String searchTerm,
                                                @RequestParam(defaultValue = "0") int pageIndex,
                                                @RequestParam(defaultValue = "10") int pageSize) {
-        return countryService.searchCountries(name, pageIndex, pageSize);
+        return countryService.searchCountries(searchTerm, pageIndex, pageSize);
     }
 
     @Operation(summary = "Get country by id", description = "Get country by id")

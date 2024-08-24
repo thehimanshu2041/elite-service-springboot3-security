@@ -13,6 +13,9 @@ import com.elite.repository.config.CodeTypeRepository;
 import com.elite.service.config.CodeTypeService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,6 +46,14 @@ public class CodeTypeServiceImpl implements CodeTypeService {
                 .stream()
                 .map(codeTypeMapper::toCodeTypeDetail)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<CodeTypeDetail> searchCodeTypeDetails(String searchTerm, int pageIndex, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<CodeType> codeTypes = codeTypeRepository.findByNameContainingIgnoreCase(searchTerm, pageRequest);
+        List<CodeTypeDetail> codeTypesDetails = codeTypes.getContent().stream().map(codeTypeMapper::toCodeTypeDetail).toList();
+        return new PageImpl<>(codeTypesDetails, pageRequest, codeTypes.getTotalElements());
     }
 
     @Override

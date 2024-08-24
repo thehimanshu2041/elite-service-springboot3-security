@@ -22,6 +22,10 @@ import org.springframework.validation.annotation.Validated;
 @Schema(name = "User detail", description = "User detail")
 public class UserDetail {
 
+    @Schema(format = "integer", description = "Provide Id")
+    @JsonProperty("id")
+    private Long id;
+
     @UsernameValidator
     @NotNull(message = "Username can't be null.")
     @Schema(format = "string", description = "Provide username")

@@ -55,9 +55,9 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public Page<CountryDetail> searchCountries(String name, int pageIndex, int pageSize) {
+    public Page<CountryDetail> searchCountries(String searchTerm, int pageIndex, int pageSize) {
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
-        Page<Country> countries = countryRepository.findByNiceNameContainingIgnoreCase(name, pageRequest);
+        Page<Country> countries = countryRepository.findByNiceNameContainingIgnoreCase(searchTerm, pageRequest);
         List<CountryDetail> countryDetails = countries.getContent().stream().map(countryMapper::toCountryDetail).toList();
         return new PageImpl<>(countryDetails, pageRequest, countries.getTotalElements());
     }

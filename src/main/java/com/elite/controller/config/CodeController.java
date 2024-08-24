@@ -13,11 +13,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @Validated
@@ -47,6 +49,25 @@ public class CodeController {
     @GetMapping
     public List<CodeDetail> getCodeDetails() {
         return codeService.getCodeDetails();
+    }
+
+    @Operation(summary = "Search code list", description = "Search code list")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Operation Successful",
+                            content =
+                            @Content(
+                                    array = @ArraySchema(schema = @Schema(implementation = CodeDetail.class))))
+            })
+    @LogExecution
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    @GetMapping("search")
+    public Page<CodeDetail> searchCodeDetails(@Nullable @RequestParam String searchTerm,
+                                              @RequestParam(defaultValue = "0") int pageIndex,
+                                              @RequestParam(defaultValue = "10") int pageSize) {
+        return codeService.searchCodeDetails(searchTerm, pageIndex, pageSize);
     }
 
     @Operation(summary = "Get code by id", description = "Get code by id")
@@ -102,6 +123,26 @@ public class CodeController {
         return codeService.getCodeDetailsByType(id);
     }
 
+    @Operation(summary = "Search code list with id", description = "Search code list with id")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Operation Successful",
+                            content =
+                            @Content(
+                                    array = @ArraySchema(schema = @Schema(implementation = CodeDetail.class))))
+            })
+    @LogExecution
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    @GetMapping("code-type/search/{id}")
+    public Page<CodeDetail> searchCodeDetailsByType(@NotNull @PathVariable Long id,
+                                                    @Nullable @RequestParam String searchTerm,
+                                                    @RequestParam(defaultValue = "0") int pageIndex,
+                                                    @RequestParam(defaultValue = "10") int pageSize) {
+        return codeService.searchCodeDetailsByType(id, searchTerm, pageIndex, pageSize);
+    }
+
     @Operation(summary = "Get code list by code", description = "Get code list by code")
     @ApiResponses(
             value = {
@@ -117,6 +158,26 @@ public class CodeController {
     @GetMapping("code-type/code/{code}")
     public List<CodeDetail> getCodeDetailsByType(@NotNull @PathVariable String code) {
         return codeService.getCodeDetailsByType(code);
+    }
+
+    @Operation(summary = "Search code list with code", description = "Search code list with code")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Operation Successful",
+                            content =
+                            @Content(
+                                    array = @ArraySchema(schema = @Schema(implementation = CodeDetail.class))))
+            })
+    @LogExecution
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    @GetMapping("code-type/code/search/{code}")
+    public Page<CodeDetail> searchCodeDetailsByType(@NotNull @PathVariable String code,
+                                                    @Nullable @RequestParam String searchTerm,
+                                                    @RequestParam(defaultValue = "0") int pageIndex,
+                                                    @RequestParam(defaultValue = "10") int pageSize) {
+        return codeService.searchCodeDetailsByType(code, searchTerm, pageIndex, pageSize);
     }
 
     @Operation(summary = "Save code", description = "Save code")

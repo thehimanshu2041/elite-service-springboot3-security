@@ -11,7 +11,7 @@ public interface CountryRepository extends JpaRepository<Country, Long> {
 
     Optional<Country> findById(Long id);
 
-    Page<Country> findByNiceNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<Country> findByNiceNameContainingIgnoreCase(String searchTerm, Pageable pageable);
 
     Optional<Country> findByIsp(String code);
 }

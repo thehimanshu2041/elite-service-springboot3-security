@@ -9,7 +9,7 @@ public interface CountryService {
 
     List<CountryDetail> getCountries();
 
-    Page<CountryDetail> searchCountries(String name, int pageIndex, int pageSize);
+    Page<CountryDetail> searchCountries(String searchTerm, int pageIndex, int pageSize);
 
     CountryDetail getCountry(Long id);
 
