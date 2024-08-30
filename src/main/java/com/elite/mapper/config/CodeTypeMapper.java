@@ -1,15 +1,14 @@
 package com.elite.mapper.config;
 
 import com.elite.entity.config.CodeType;
-import com.elite.model.config.CodeTypeDetail;
+import com.elite.model.config.CodeTypeModel;
+import com.elite.model.config.CodeTypeReqModel;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface CodeTypeMapper {
 
-    @Mapping(target = "id", ignore = true)
-    CodeType toCodeType(CodeTypeDetail codeTypeDetail);
+    CodeType convertCodeTypeReqModelToCodeType(CodeTypeReqModel codeTypeReqModel);
 
-    CodeTypeDetail toCodeTypeDetail(CodeType codeType);
+    CodeTypeModel convertCodeTypeToCodeTypeModel(CodeType codeType);
 }

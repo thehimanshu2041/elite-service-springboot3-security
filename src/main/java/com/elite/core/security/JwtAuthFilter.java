@@ -1,7 +1,7 @@
 package com.elite.core.security;
 
 import com.elite.service.UserDetailService;
-import com.elite.service.config.IpAddressService;
+import com.elite.service.user.IpAddressService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

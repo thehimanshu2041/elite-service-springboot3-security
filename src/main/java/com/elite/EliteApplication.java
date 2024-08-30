@@ -27,7 +27,7 @@ public class EliteApplication {
             public void addCorsMappings(CorsRegistry reg) {
                 reg.addMapping("/**")
                         .allowedOrigins("*")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")
                         .allowedHeaders("*");
             }
         };

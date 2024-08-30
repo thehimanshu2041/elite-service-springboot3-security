@@ -1,24 +1,36 @@
 package com.elite.service.user;
 
-import com.elite.model.Login;
-import com.elite.model.user.UserDetail;
+import com.elite.model.LoginReqModel;
+import com.elite.model.user.*;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 public interface UserService {
 
-    String login(Login login);
+    String login(LoginReqModel loginReqModel);
 
-    boolean registration(UserDetail userDetail);
+    UserModel registration(UserReqModel userReqModel);
 
-    UserDetail getUserDetail();
+    UserModel getUserDetails();
 
-    UserDetail getUserDetail(Long id);
+    UserModel getUserDetailById(Long id);
 
-    Page<UserDetail> searchUserDetail(String searchTerm, int pageIndex, int pageSize);
+    UserModel updateUserDetail(Long id, UserReqModel userReqModel);
 
-    UserDetail updateUserDetail(Long id, UserDetail userDetail);
+    UserModel patchUserDetail(Long id, UserPatchReqModel userPatchReqModel);
 
-    ResponseEntity<?> downloadUserDetail();
+    UserModel patchUserPassword(Long id, UserPasswordPatchReqModel userPasswordPatchReqModel);
+
+    Boolean deleteUserDetail(Long id);
+
+    UserSettingModel getUserSettings();
+
+    UserSettingModel patchUserSettings(Long id, UserPatchSettingReqModel userPatchSettingReqModel);
+
+    ResponseEntity<?> getUserDetailsPdf();
+
+    ResponseEntity<?> getUserDetailsQR();
+
+    Page<UserModel> searchUserDetails(String searchTerm, int pageIndex, int pageSize);
 
 }

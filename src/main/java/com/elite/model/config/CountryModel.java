@@ -13,34 +13,34 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Schema(name = "Country Detail", description = "Country detail")
-public class CountryDetail {
+@Schema(name = "CountryModel", description = "Country model")
+public class CountryModel {
 
-    @Schema(format = "integer", description = "Provide username")
+    @Schema(format = "integer", description = "Id")
     @JsonProperty("id")
     private Long id;
 
-    @Schema(format = "string", description = "Provide username")
+    @Schema(format = "string", description = "Isp")
     @JsonProperty("isp")
     private String isp;
 
-    @Schema(format = "string", description = "Provide username")
+    @Schema(format = "string", description = "Name")
     @JsonProperty("name")
     private String name;
 
-    @Schema(format = "string", description = "Provide username")
+    @Schema(format = "string", description = "Nice name")
     @JsonProperty("niceName")
     private String niceName;
 
-    @Schema(format = "string", description = "Provide username")
+    @Schema(format = "string", description = "Iso3")
     @JsonProperty("iso3")
     private String iso3;
 
-    @Schema(format = "string", description = "Provide username")
+    @Schema(format = "string", description = "Num code")
     @JsonProperty("numCode")
-    private String numCode;
+    private Long numCode;
 
-    @Schema(format = "integer", description = "Provide username")
+    @Schema(format = "integer", description = "Phone code")
     @JsonProperty("phoneCode")
     private Long phoneCode;
 }

@@ -15,7 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Schema(name = "Error message", description = "Error message")
+@Schema(name = "ErrorMessage", description = "Error message")
 public class ErrorMessage {
 
     @JsonProperty("status")

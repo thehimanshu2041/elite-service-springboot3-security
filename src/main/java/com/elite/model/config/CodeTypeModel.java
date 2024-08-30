@@ -3,7 +3,6 @@ package com.elite.model.config;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,25 +15,22 @@ import org.springframework.validation.annotation.Validated;
 @AllArgsConstructor
 @Validated
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Schema(name = "Code Type Detail", description = "Code Type Detail")
-public class CodeTypeDetail {
+@Schema(name = "CodeTypeModel", description = "Code type model")
+public class CodeTypeModel {
 
-    @Schema(format = "integer", description = "Provide id")
+    @Schema(format = "integer", description = "Id")
     @JsonProperty("id")
     private Long id;
 
-    @NotNull(message = "Code can't be null.")
-    @Schema(format = "string", description = "Provide code")
+    @Schema(format = "string", description = "Code")
     @JsonProperty("code")
     private String code;
 
-    @NotNull(message = "Name can't be null.")
-    @Schema(format = "string", description = "Provide name")
+    @Schema(format = "string", description = "Name")
     @JsonProperty("name")
     private String name;
 
-    @NotNull(message = "Description can't be null.")
-    @Schema(format = "string", description = "Provide code")
+    @Schema(format = "string", description = "Code")
     @JsonProperty("description")
     private String description;
 }

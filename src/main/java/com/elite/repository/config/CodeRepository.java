@@ -14,10 +14,10 @@ public interface CodeRepository extends JpaRepository<Code, Long> {
 
     Optional<Code> findByCode(String code);
 
-    List<Code> findAllByCodeTypeId(Long id);
+    List<Code> findAllByCodeTypeIdOrderByUpdatedDateDesc(Long id);
 
-    Page<Code> findByNameContainingIgnoreCase(String searchTerm, Pageable pageable);
+    Page<Code> findByNameContainingIgnoreCaseOrderByUpdatedDateDesc(String searchTerm, Pageable pageable);
 
-    Page<Code> findByCodeTypeIdAndNameContainingIgnoreCase(Long id, String searchTerm, Pageable pageable);
+    Page<Code> findByCodeTypeIdAndNameContainingIgnoreCaseOrderByUpdatedDateDesc(Long id, String searchTerm, Pageable pageable);
 
 }

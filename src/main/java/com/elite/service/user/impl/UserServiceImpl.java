@@ -14,15 +14,17 @@ import com.elite.entity.user.User;
 import com.elite.entity.user.UserSetting;
 import com.elite.mapper.config.CodeMapper;
 import com.elite.mapper.config.CountryMapper;
+import com.elite.mapper.user.UserSettingMapper;
 import com.elite.mapper.user.UsersMapper;
-import com.elite.model.Login;
-import com.elite.model.user.UserDetail;
+import com.elite.model.LoginReqModel;
+import com.elite.model.user.*;
 import com.elite.repository.config.CodeRepository;
 import com.elite.repository.config.CountryRepository;
-import com.elite.repository.config.UserSettingRepository;
 import com.elite.repository.user.RoleRepository;
 import com.elite.repository.user.UserRepository;
+import com.elite.repository.user.UserSettingRepository;
 import com.elite.service.config.MailService;
+import com.elite.service.config.QRService;
 import com.elite.service.user.UserService;
 import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.html2pdf.HtmlConverter;
@@ -44,6 +46,8 @@ import org.thymeleaf.context.Context;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -74,16 +78,20 @@ public class UserServiceImpl implements UserService {
 
     private final MailService mailService;
 
+    private final QRService qrService;
+
     private final TemplateEngine templateEngine;
 
     private final ServletContext servletContext;
+
+    private final UserSettingMapper userSettingMapper;
 
     public UserServiceImpl(AuthenticationManager authenticationManager, JwtService jwtService,
                            UserRepository userRepository, RoleRepository roleRepository,
                            CodeRepository codeRepository, CountryRepository countryRepository,
                            UserSettingRepository userSettingRepository, AuthUserStore authUserStore,
                            UsersMapper usersMapper, CountryMapper countryMapper, CodeMapper codeMapper,
-                           MailService mailService, TemplateEngine templateEngine, ServletContext servletContext) {
+                           MailService mailService, QRService qrService, TemplateEngine templateEngine, ServletContext servletContext, UserSettingMapper userSettingMapper) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.userRepository = userRepository;
@@ -96,17 +104,19 @@ public class UserServiceImpl implements UserService {
         this.countryMapper = countryMapper;
         this.codeMapper = codeMapper;
         this.mailService = mailService;
+        this.qrService = qrService;
         this.templateEngine = templateEngine;
         this.servletContext = servletContext;
+        this.userSettingMapper = userSettingMapper;
     }
 
     @Override
-    public String login(Login login) {
-        log.info(MessageResource.getMessage(ESLog.ES_006), login.getUsername());
+    public String login(LoginReqModel loginReqModel) {
+        log.info(MessageResource.getMessage(ESLog.ES_006), loginReqModel.getUsername());
         Authentication authentication =
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()));
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginReqModel.getUsername(), loginReqModel.getPassword()));
         if (authentication.isAuthenticated()) {
-            log.info(MessageResource.getMessage(ESLog.ES_007), login.getUsername());
+            log.info(MessageResource.getMessage(ESLog.ES_007), loginReqModel.getUsername());
             return jwtService.generateToken(authentication);
         } else {
             throw new ServiceException(MessageResource.getMessage(ESFault.ES_002));
@@ -114,78 +124,141 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean registration(UserDetail userDetail) {
-        log.info(MessageResource.getMessage(ESLog.ES_008), userDetail.getUsername());
+    public UserModel registration(UserReqModel userReqModel) {
+        log.info(MessageResource.getMessage(ESLog.ES_008), userReqModel.getUsername());
         if (null != userRepository
-                .findByUsername(userDetail.getUsername())
+                .findByUsername(userReqModel.getUsername())
                 .orElse(null)) {
             throw new ServiceException(MessageResource.getMessage(ESFault.ES_005));
         }
 
         if (null != userRepository
-                .findByEmail(userDetail.getEmail())
+                .findByEmail(userReqModel.getEmail())
                 .orElse(null)) {
             throw new ServiceException(MessageResource.getMessage(ESFault.ES_004));
         }
 
         User user = new User();
-        convertUserDetailToUser(userDetail, user);
-        user.setUserRoles(roleRepository.findAllByNameIn(Collections.singletonList(RoleType.USER)));
+        convertUserReqModelToUser(userReqModel, user);
+        user.setUserRoles(new HashSet<>(roleRepository.findAllByNameIn(Collections.singletonList(RoleType.USER))));
         user = userRepository.save(user);
-        log.info(MessageResource.getMessage(ESLog.ES_009), userDetail.getUsername());
+        log.info(MessageResource.getMessage(ESLog.ES_009), userReqModel.getUsername());
         createUserSetting(user.getId(), user.getUsername());
         sendWelcomeUserRegisterEmail(user.getEmail(), user.getUsername());
-        return true;
+        return convertUserToUserModel(user);
     }
 
     @Override
-    public UserDetail getUserDetail() {
+    public UserModel getUserDetails() {
         log.info(MessageResource.getMessage(ESLog.ES_013));
         User user = userRepository
                 .findByUsername(authUserStore.getLoggedInUser())
                 .orElseThrow(() ->
                         new NotFoundException(MessageResource.getMessage(ESFault.ES_003)));
         log.info(MessageResource.getMessage(ESLog.ES_014));
-        return convertUserToUserDetail(user);
+        return convertUserToUserModel(user);
     }
 
     @Override
-    public UserDetail getUserDetail(Long id) {
+    public UserModel getUserDetailById(Long id) {
         log.info(MessageResource.getMessage(ESLog.ES_013));
         User user = userRepository
                 .findById(id)
                 .orElseThrow(() ->
                         new NotFoundException(MessageResource.getMessage(ESFault.ES_003)));
         log.info(MessageResource.getMessage(ESLog.ES_014));
-        return convertUserToUserDetail(user);
+        return convertUserToUserModel(user);
     }
 
     @Override
-    public Page<UserDetail> searchUserDetail(String searchTerm, int pageIndex, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
-        Page<User> users = userRepository.findByUsernameContainingIgnoreCase(searchTerm, pageRequest);
-        List<UserDetail> userDetails = users.getContent().stream().map(this::convertUserToUserDetail).toList();
-        return new PageImpl<>(userDetails, pageRequest, users.getTotalElements());
-    }
-
-    @Override
-    public UserDetail updateUserDetail(Long id, UserDetail userDetail) {
+    public UserModel updateUserDetail(Long id, UserReqModel userReqModel) {
         log.info(MessageResource.getMessage(ESLog.ES_033));
         User user = userRepository
                 .findById(id)
                 .orElseThrow(() ->
                         new NotFoundException(MessageResource.getMessage(ESFault.ES_003)));
-        convertUserDetailToUser(userDetail, user);
+        convertUserReqModelToUser(userReqModel, user);
         User updatedUser = userRepository.save(user);
         log.info(MessageResource.getMessage(ESLog.ES_034));
-        return convertUserToUserDetail(updatedUser);
+        return convertUserToUserModel(updatedUser);
     }
 
     @Override
-    public ResponseEntity<?> downloadUserDetail() {
+    public UserModel patchUserDetail(Long id, UserPatchReqModel userPatchReqModel) {
+        log.info(MessageResource.getMessage(ESLog.ES_033));
+        User user = userRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_003)));
+        convertUserPatchReqModelToUser(userPatchReqModel, user);
+        User updatedUser = userRepository.save(user);
+        log.info(MessageResource.getMessage(ESLog.ES_034));
+        return convertUserToUserModel(updatedUser);
+    }
+
+    @Override
+    public UserModel patchUserPassword(Long id, UserPasswordPatchReqModel userPasswordPatchReqModel) {
+        log.info(MessageResource.getMessage(ESLog.ES_033));
+        User user = userRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_003)));
+        if (BCrypt.checkpw(userPasswordPatchReqModel.getOldPassword(), user.getPassword())) {
+            user.setPassword(BCrypt.hashpw(userPasswordPatchReqModel.getPassword(), BCrypt.gensalt()));
+            user = userRepository.save(user);
+            return convertUserToUserModel(user);
+        }
+        throw new ServiceException(MessageResource.getMessage(ESFault.ES_002));
+    }
+
+    @Override
+    public Boolean deleteUserDetail(Long id) {
+        log.info(MessageResource.getMessage(ESLog.ES_033));
+        User user = userRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_003)));
+        userSettingRepository.findByUserId(user.getId()).ifPresent(userSettingRepository::delete);
+        userRepository.delete(user);
+        return true;
+    }
+
+    @Override
+    public UserSettingModel getUserSettings() {
+        User user = userRepository
+                .findByUsername(authUserStore.getLoggedInUser())
+                .orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_003)));
+        UserSetting userSetting = userSettingRepository
+                .findByUserId(user.getId())
+                .orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_003)));
+        return userSettingMapper.toUserSettingDetail(userSetting);
+    }
+
+    @Override
+    public UserSettingModel patchUserSettings(Long id, UserPatchSettingReqModel userPatchSettingReqModel) {
+        UserSetting userSetting = userSettingRepository
+                .findByUserId(id)
+                .orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_003)));
+        if (userPatchSettingReqModel.getRefreshCredentials()) {
+            userSetting.setUid(authUserStore.generateRandomSecretKey(8));
+            userSetting.setSecret(authUserStore.generateRandomSecretKey(32));
+            userSetting.setToken(authUserStore.generateRandomSecretKey(32));
+        }
+        userSetting.setNotification(userPatchSettingReqModel.getNotification());
+        userSetting.setEmail(userPatchSettingReqModel.getEmail());
+        userSetting.setNightMode(userPatchSettingReqModel.getNightMode());
+        userSetting = userSettingRepository.save(userSetting);
+        return userSettingMapper.toUserSettingDetail(userSetting);
+    }
+
+    @Override
+    public ResponseEntity<?> getUserDetailsPdf() {
         byte[] bytes = null;
         try {
-            UserDetail user = getUserDetail();
+            UserModel user = getUserDetails();
             Context context = new Context();
             context.setVariable("user", user);
             String orderHtml = templateEngine.process("user-detail", context);
@@ -201,6 +274,31 @@ public class UserServiceImpl implements UserService {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=user-detail.pdf")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(bytes);
+    }
+
+    @Override
+    public ResponseEntity<?> getUserDetailsQR() {
+        UserModel userModel = getUserDetails();
+        HashMap<String, String> qrMap = new HashMap<>();
+        qrMap.put("name", userModel.getFirstName() + ' ' + userModel.getLastName());
+        qrMap.put("username", userModel.getUsername());
+        qrMap.put("email", userModel.getEmail());
+        qrMap.put("address", userModel.getAddress());
+        qrMap.put("phone", "+" + userModel.getCountry().getPhoneCode() + "-" + userModel.getPhone());
+        qrMap.put("country", userModel.getCountry().getNiceName());
+        byte[] qrCode = qrService.generateQRCode(qrMap, 320, 200);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_PNG);
+        headers.setContentLength(qrCode.length);
+        return ResponseEntity.ok().headers(headers).body(qrCode);
+    }
+
+    @Override
+    public Page<UserModel> searchUserDetails(String searchTerm, int pageIndex, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<User> users = userRepository.findByUsernameContainingIgnoreCaseOrderByUpdatedDateDesc(searchTerm, pageRequest);
+        List<UserModel> userModels = users.getContent().stream().map(this::convertUserToUserModel).toList();
+        return new PageImpl<>(userModels, pageRequest, users.getTotalElements());
     }
 
     private void createUserSetting(Long userId, String username) {
@@ -222,40 +320,53 @@ public class UserServiceImpl implements UserService {
     }
 
     private void sendWelcomeUserRegisterEmail(String email, String username) {
-        try {
-            mailService.sendUserRegisterWelcomeMail(email, "New user welcome !!!", username);
-        } catch (Exception e) {
-            log.error(MessageResource.getMessage(ESFault.ES_006), username, e.getMessage());
-        }
+        mailService.sendUserRegisterWelcomeMail(email, "New user welcome !!!", username);
     }
 
-    private void convertUserDetailToUser(UserDetail userDetail, User user) {
-        user.setUsername(userDetail.getUsername());
-        user.setEmail(userDetail.getEmail());
-        user.setPassword(BCrypt.hashpw(userDetail.getPassword(), BCrypt.gensalt()));
-        user.setFirstName(userDetail.getFirstName());
-        user.setLastName(userDetail.getLastName());
-        user.setAddress(userDetail.getAddress());
-        user.setPhone(userDetail.getPhone());
+    private void convertUserPatchReqModelToUser(UserPatchReqModel userPatchReqModel, User user) {
+        user.setUsername(userPatchReqModel.getUsername());
+        user.setEmail(userPatchReqModel.getEmail());
+        user.setFirstName(userPatchReqModel.getFirstName());
+        user.setLastName(userPatchReqModel.getLastName());
+        user.setAddress(userPatchReqModel.getAddress());
+        user.setPhone(userPatchReqModel.getPhone());
         Code gender = codeRepository
-                .findById(userDetail.getGender().getId()).orElseThrow(() ->
+                .findById(userPatchReqModel.getGenderId()).orElseThrow(() ->
                         new NotFoundException(MessageResource.getMessage(ESFault.ES_007)));
         Country country = countryRepository
-                .findById(userDetail.getCountry().getId()).orElseThrow(() ->
+                .findById(userPatchReqModel.getCountryId()).orElseThrow(() ->
                         new NotFoundException(MessageResource.getMessage(ESFault.ES_008)));
         user.setGender(gender.getId());
         user.setCountry(country.getId());
     }
 
-    private UserDetail convertUserToUserDetail(User user) {
-        UserDetail userDetail = usersMapper.toUserDetail(user);
-        userDetail.setId(user.getId());
-        userDetail.setCountry(
-                countryMapper.toUserDetailCountry(
+    private void convertUserReqModelToUser(UserReqModel userReqModel, User user) {
+        user.setUsername(userReqModel.getUsername());
+        user.setEmail(userReqModel.getEmail());
+        user.setPassword(BCrypt.hashpw(userReqModel.getPassword(), BCrypt.gensalt()));
+        user.setFirstName(userReqModel.getFirstName());
+        user.setLastName(userReqModel.getLastName());
+        user.setAddress(userReqModel.getAddress());
+        user.setPhone(userReqModel.getPhone());
+        Code gender = codeRepository
+                .findById(userReqModel.getGenderId()).orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_007)));
+        Country country = countryRepository
+                .findById(userReqModel.getCountryId()).orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_008)));
+        user.setGender(gender.getId());
+        user.setCountry(country.getId());
+    }
+
+    private UserModel convertUserToUserModel(User user) {
+        UserModel userModel = usersMapper.toUserDetail(user);
+        userModel.setId(user.getId());
+        userModel.setCountry(
+                countryMapper.convertCountrytoCountryModel(
                         countryRepository.findById(user.getCountry()).orElse(null)));
-        userDetail.setGender(
-                codeMapper.toUserDetailGender(
+        userModel.setGender(
+                codeMapper.convertCodeToCodeModel(
                         codeRepository.findById(user.getGender()).orElse(null)));
-        return userDetail;
+        return userModel;
     }
 }

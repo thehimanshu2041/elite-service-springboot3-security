@@ -2,8 +2,9 @@ package com.elite.controller;
 
 import com.elite.constants.WebResource;
 import com.elite.core.log.LogExecution;
-import com.elite.model.Login;
-import com.elite.model.user.UserDetail;
+import com.elite.model.LoginReqModel;
+import com.elite.model.user.UserModel;
+import com.elite.model.user.UserReqModel;
 import com.elite.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -45,8 +46,8 @@ public class AuthController {
             })
     @LogExecution
     @PostMapping(value = "login")
-    public String login(@Valid @RequestBody Login login) {
-        return userService.login(login);
+    public String login(@Valid @RequestBody LoginReqModel loginReqModel) {
+        return userService.login(loginReqModel);
     }
 
     @Operation(summary = "User registration", description = "User registration")
@@ -62,7 +63,7 @@ public class AuthController {
             })
     @LogExecution
     @PostMapping(value = "registration")
-    public boolean registration(@Valid @RequestBody UserDetail userDetail) {
-        return userService.registration(userDetail);
+    public UserModel registration(@Valid @RequestBody UserReqModel userReqModel) {
+        return userService.registration(userReqModel);
     }
 }

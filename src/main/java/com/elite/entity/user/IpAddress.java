@@ -1,4 +1,4 @@
-package com.elite.entity.config;
+package com.elite.entity.user;
 
 import com.elite.core.security.AuthUserStore;
 import jakarta.persistence.*;

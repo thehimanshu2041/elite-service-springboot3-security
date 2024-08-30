@@ -7,7 +7,8 @@ import com.elite.core.factory.MessageResource;
 import com.elite.core.log.ESLog;
 import com.elite.entity.config.Country;
 import com.elite.mapper.config.CountryMapper;
-import com.elite.model.config.CountryDetail;
+import com.elite.model.config.CountryModel;
+import com.elite.model.config.CountryReqModel;
 import com.elite.repository.config.CountryRepository;
 import com.elite.service.config.CountryService;
 import lombok.extern.slf4j.Slf4j;
@@ -38,16 +39,16 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public List<CountryDetail> getCountries() {
+    public List<CountryModel> getCountries() {
         log.info(MessageResource.getMessage(ESLog.ES_017));
-        List<CountryDetail> countries = new ArrayList<>();
+        List<CountryModel> countries = new ArrayList<>();
         if (cacheStoreList.check(COUNTRY_CACHE)) {
             countries = cacheStoreList.get(COUNTRY_CACHE);
         } else {
             countries = countryRepository
                     .findAll()
                     .stream()
-                    .map(countryMapper::toCountryDetail)
+                    .map(countryMapper::convertCountrytoCountryModel)
                     .toList();
             cacheStoreList.add(COUNTRY_CACHE, countries);
         }
@@ -55,30 +56,57 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public Page<CountryDetail> searchCountries(String searchTerm, int pageIndex, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
-        Page<Country> countries = countryRepository.findByNiceNameContainingIgnoreCase(searchTerm, pageRequest);
-        List<CountryDetail> countryDetails = countries.getContent().stream().map(countryMapper::toCountryDetail).toList();
-        return new PageImpl<>(countryDetails, pageRequest, countries.getTotalElements());
+    public CountryModel createCountry(CountryReqModel countryReqModel) {
+        Country country = countryMapper.convertCountryReqModelToCountry(countryReqModel);
+        country = countryRepository.save(country);
+        return countryMapper.convertCountrytoCountryModel(country);
     }
 
     @Override
-    public CountryDetail getCountry(Long id) {
+    public CountryModel updateCountry(Long id, CountryReqModel countryReqModel) {
+        countryRepository
+                .findById(id).orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_008)));
+        Country country = countryMapper.convertCountryReqModelToCountry(countryReqModel);
+        country.setId(id);
+        country = countryRepository.save(country);
+        return countryMapper.convertCountrytoCountryModel(country);
+    }
+
+    @Override
+    public Boolean deleteCountry(Long id) {
+        Country country = countryRepository
+                .findById(id).orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_008)));
+        countryRepository.delete(country);
+        return true;
+    }
+
+    @Override
+    public CountryModel getCountryById(Long id) {
         log.info(MessageResource.getMessage(ESLog.ES_018), id);
         return countryMapper
-                .toCountryDetail(
+                .convertCountrytoCountryModel(
                         countryRepository
                                 .findById(id).orElseThrow(() ->
                                         new NotFoundException(MessageResource.getMessage(ESFault.ES_008))));
     }
 
     @Override
-    public CountryDetail getCountry(String code) {
+    public CountryModel getCountryByCode(String code) {
         log.info(MessageResource.getMessage(ESLog.ES_019), code);
         return countryMapper
-                .toCountryDetail(
+                .convertCountrytoCountryModel(
                         countryRepository
                                 .findByIsp(code).orElseThrow(() ->
                                         new NotFoundException(MessageResource.getMessage(ESFault.ES_008))));
+    }
+
+    @Override
+    public Page<CountryModel> searchCountries(String searchTerm, int pageIndex, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<Country> countries = countryRepository.findByNiceNameContainingIgnoreCase(searchTerm, pageRequest);
+        List<CountryModel> countryModels = countries.getContent().stream().map(countryMapper::convertCountrytoCountryModel).toList();
+        return new PageImpl<>(countryModels, pageRequest, countries.getTotalElements());
     }
 }

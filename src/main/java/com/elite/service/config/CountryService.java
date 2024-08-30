@@ -1,17 +1,25 @@
 package com.elite.service.config;
 
-import com.elite.model.config.CountryDetail;
+import com.elite.model.config.CountryModel;
+import com.elite.model.config.CountryReqModel;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface CountryService {
 
-    List<CountryDetail> getCountries();
+    List<CountryModel> getCountries();
 
-    Page<CountryDetail> searchCountries(String searchTerm, int pageIndex, int pageSize);
+    CountryModel createCountry(CountryReqModel countryReqModel);
 
-    CountryDetail getCountry(Long id);
+    CountryModel updateCountry(Long id, CountryReqModel countryReqModel);
 
-    CountryDetail getCountry(String code);
+    Boolean deleteCountry(Long id);
+
+    CountryModel getCountryById(Long id);
+
+    CountryModel getCountryByCode(String code);
+
+    Page<CountryModel> searchCountries(String searchTerm, int pageIndex, int pageSize);
+
 }

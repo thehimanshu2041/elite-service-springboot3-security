@@ -1,159 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>User Details</title>
+    <title th:text="${user?.firstName + ' ' + user?.lastName}"></title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-            color: #333;
+            font-family: math, monospace, Arial, sans-serif;
         }
 
         .container {
-            width: 80%;
-            max-width: 1200px;
-            margin: 40px auto;
+            max-width: 700px;
+            margin: 0 auto;
+            border: 1px solid #293040;
             padding: 20px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
         }
 
         .header {
-            text-align: center;
-            padding: 20px;
-            background-color: #4CAF50;
+            background-color: #293040;
             color: white;
-        }
-
-        .left, .right {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .left {
-            border-right: 2px solid #ddd;
-            padding-right: 20px;
-        }
-
-        .section {
-            margin-bottom: 20px;
-        }
-
-        .section h2 {
-            font-size: 24px;
-            border-bottom: 2px solid #4CAF50;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            color: #4CAF50;
-        }
-
-        .info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #fafafa;
-            margin-bottom: 10px;
-        }
-
-        .info label {
+            text-align: center;
+            font-size: 24px;
             font-weight: bold;
-            color: #555;
-            flex-basis: 40%;
         }
 
-        .info p {
-            margin: 0;
-            text-align: right;
-            flex-basis: 60%;
+        .section-title {
+            background-color: #293040;
+            color: white;
+            padding: 5px;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin: 10px 0;
+        }
+
+        .form-group label {
+            display: inline-block;
+            width: 150px;
+        }
+
+        .document-checkbox {
+            display: flex;
+            align-items: center;
+        }
+
+        .document-checkbox label {
+            margin-left: 5px;
         }
 
         .footer {
+            margin-top: 10px;
             text-align: center;
-            font-size: 14px;
-            color: #666;
-            padding: 10px;
-            border-top: 1px solid #ddd;
-            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .confidential {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
-
 <div class="container">
     <div class="header">
-        <h1 th:text="${user?.firstName + ' ' + user?.lastName}"></h1>
+        <span th:text="${user?.firstName + ' ' + user?.lastName}"></span>
     </div>
-    <div class="left">
-        <div class="section">
-            <h2>Personal Information</h2>
-            <div class="info">
-                <label for="username">Username:</label>
-                <p id="username" th:text="${user?.username}"></p>
-            </div>
-            <div class="info">
-                <label for="email">Email:</label>
-                <p id="email" th:text="${user?.email}"></p>
-            </div>
-            <div class="info">
-                <label for="first_name">First Name:</label>
-                <p id="first_name" th:text="${user?.firstName}"></p>
-            </div>
-            <div class="info">
-                <label for="last_name">Last Name:</label>
-                <p id="last_name" th:text="${user?.lastName}"></p>
-            </div>
-            <div class="info">
-                <label for="gender">Gender:</label>
-                <p id="gender" th:text="${user?.gender?.id}"></p>
-            </div>
-            <div class="info">
-                <label for="address">Address:</label>
-                <p id="address" th:text="${user?.address}"></p>
-            </div>
-            <div class="info">
-                <label for="phone">Phone:</label>
-                <p id="phone"
-                   th:text="${(user?.country != null ? '+' + user?.country?.phoneCode + '-' : '') + user?.phone}"></p>
-            </div>
-        </div>
+
+    <div class="section-title">
+        Personal Information
     </div>
-    <div class="right">
-        <div class="section">
-            <h2>Country Information</h2>
-            <div class="info">
-                <label for="country_name">Country:</label>
-                <p id="country_name" th:text="${user?.country != null ? user?.country?.niceName : ''}"></p>
-            </div>
-            <div class="info">
-                <label for="iso3">ISO3:</label>
-                <p id="iso3" th:text="${user?.country != null ? user?.country?.iso3 : ''}"></p>
-            </div>
-            <div class="info">
-                <label for="phoneCode">Phone Code:</label>
-                <p id="phoneCode" th:text="${user?.country != null ? '+' + user?.country?.phoneCode : ''}"></p>
-            </div>
-        </div>
-        <div class="section">
-            <h2>Additional Information</h2>
-            <div class="info">
-                <label for="additional_info">Additional Info:</label>
-                <p id="additional_info">N/A</p>
-            </div>
-        </div>
+    <div class="form-group">
+        <label>Name: <span id="name" th:text="${user?.firstName + ' ' + user?.lastName}"></span> </label>
+
     </div>
-</div>
-<div class="footer">
-    ©2024 Elite.
+    <div class="form-group">
+        <label>Username: <span id="username" th:text="${user?.username}"></span></label>
+    </div>
+    <div class="form-group">
+        <label>Email: <span id="email" th:text="${user?.email}"></span></label>
+    </div>
+    <div class="form-group">
+        <label>Gender: <span id="gender" th:text="${user?.gender?.name}"></span></label>
+    </div>
+
+    <div class="section-title">
+        Contact Information
+    </div>
+    <div class="form-group">
+        <label>Address: <span id="address" th:text="${user?.address}"></span></label>
+    </div>
+    <div class="form-group">
+        <label>Phone: <span id="phone"
+                            th:text="${(user?.country != null ? '+' + user?.country?.phoneCode + '-' : '') + user?.phone}"></span></label>
+    </div>
+    <div class="form-group">
+        <label>Country: <span id="country" th:text="${user?.country?.niceName}"></span></label>
+    </div>
+    <div class="section-title">
+        Banking Information
+    </div>
+    <div class="form-group">
+        <label>Bank/Building Society:</label>
+    </div>
+    <div class="form-group">
+        <label>Branch:</label>
+    </div>
+    <div class="form-group">
+        <label>Sort Code:</label>
+    </div>
+    <div class="form-group">
+        <label>Account Number:</label>
+    </div>
+
+    <div class="document-checkbox">
+        <input type="checkbox" id="dl" name="dl">
+        <label for="dl">Driving License</label>
+    </div>
+    <div class="document-checkbox">
+        <input type="checkbox" id="pbc" name="pbc">
+        <label for="pbc">Passport, Birth Certificate or Work Permit</label>
+    </div>
+    <div class="section-title">
+        Additional Information
+    </div>
+    <div class="form-group">
+        <label>Other: <span id="other">N/A</span></label>
+    </div>
+
+    <div class="confidential">
+        PRIVATE & CONFIDENTIAL
+    </div>
+
+    <div class="footer">
+        @elite:2024
+    </div>
 </div>
 </body>
 </html>

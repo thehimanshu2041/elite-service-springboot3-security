@@ -1,31 +1,34 @@
 package com.elite.service.config;
 
-import com.elite.model.config.CodeDetail;
+import com.elite.model.config.CodeModel;
+import com.elite.model.config.CodeReqModel;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface CodeService {
 
-    List<CodeDetail> getCodeDetails();
+    List<CodeModel> getCodeDetails();
 
-    CodeDetail getCode(Long id);
+    CodeModel getCodeById(Long id);
 
-    CodeDetail getCode(String code);
+    CodeModel getCodeByCode(String code);
 
-    List<CodeDetail> getCodeDetailsByType(Long id);
+    CodeModel createCode(CodeReqModel codeReqModel);
 
-    List<CodeDetail> getCodeDetailsByType(String code);
+    CodeModel updateCode(Long id, CodeReqModel codeReqModel);
 
-    CodeDetail createCode(CodeDetail codeTypeDetail);
+    Boolean deleteCode(Long id);
 
-    CodeDetail updateCode(Long id, CodeDetail codeTypeDetail);
+    List<CodeModel> getCodeDetailsByTypeId(Long id);
 
-    Page<CodeDetail> searchCodeDetails(String searchTerm, int pageIndex, int pageSize);
+    List<CodeModel> getCodeDetailsByTypeCode(String code);
 
-    Page<CodeDetail> searchCodeDetailsByType(Long id, String searchTerm, int pageIndex, int pageSize);
+    Page<CodeModel> searchCodeDetails(String searchTerm, int pageIndex, int pageSize);
 
-    Page<CodeDetail> searchCodeDetailsByType(String code, String searchTerm, int pageIndex, int pageSize);
+    Page<CodeModel> searchCodeDetailsByTypeId(Long id, String searchTerm, int pageIndex, int pageSize);
 
-    void deleteCode(Long id);
+    Page<CodeModel> searchCodeDetailsByTypeCode(String code, String searchTerm, int pageIndex, int pageSize);
+
+
 }

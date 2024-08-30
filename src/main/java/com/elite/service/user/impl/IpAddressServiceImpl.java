@@ -1,12 +1,12 @@
-package com.elite.service.config.impl;
+package com.elite.service.user.impl;
 
 import com.elite.core.factory.MessageResource;
 import com.elite.core.log.ESLog;
 import com.elite.core.security.AuthUserStore;
 import com.elite.core.security.JwtService;
-import com.elite.entity.config.IpAddress;
+import com.elite.entity.user.IpAddress;
 import com.elite.repository.config.IpAddressRepository;
-import com.elite.service.config.IpAddressService;
+import com.elite.service.user.IpAddressService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

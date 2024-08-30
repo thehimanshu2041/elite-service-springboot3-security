@@ -7,7 +7,8 @@ import com.elite.core.log.ESLog;
 import com.elite.entity.config.Code;
 import com.elite.entity.config.CodeType;
 import com.elite.mapper.config.CodeMapper;
-import com.elite.model.config.CodeDetail;
+import com.elite.model.config.CodeModel;
+import com.elite.model.config.CodeReqModel;
 import com.elite.repository.config.CodeRepository;
 import com.elite.repository.config.CodeTypeRepository;
 import com.elite.service.config.CodeService;
@@ -38,20 +39,20 @@ public class CodeServiceImpl implements CodeService {
 
 
     @Override
-    public List<CodeDetail> getCodeDetails() {
+    public List<CodeModel> getCodeDetails() {
         log.info(MessageResource.getMessage(ESLog.ES_026));
         return codeRepository
                 .findAll()
                 .stream()
-                .map(codeMapper::toCodeDetail)
+                .map(codeMapper::convertCodeToCodeModel)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public CodeDetail getCode(Long id) {
+    public CodeModel getCodeById(Long id) {
         log.info(MessageResource.getMessage(ESLog.ES_027), id);
         return codeMapper
-                .toCodeDetail(
+                .convertCodeToCodeModel(
                         codeRepository
                                 .findById(id)
                                 .orElseThrow(() ->
@@ -59,97 +60,104 @@ public class CodeServiceImpl implements CodeService {
     }
 
     @Override
-    public CodeDetail getCode(String code) {
+    public CodeModel getCodeByCode(String code) {
         log.info(MessageResource.getMessage(ESLog.ES_028), code);
         return codeMapper
-                .toCodeDetail(
+                .convertCodeToCodeModel(
                         codeRepository
                                 .findByCode(code)
                                 .orElseThrow(() ->
                                         new NotFoundException(MessageResource.getMessage(ESFault.ES_010))));
     }
 
-    @Override
-    public List<CodeDetail> getCodeDetailsByType(Long id) {
-        log.info(MessageResource.getMessage(ESLog.ES_029), id);
-        codeTypeRepository.findById(id)
-                .orElseThrow(() ->
-                        new NotFoundException(MessageResource.getMessage(ESFault.ES_009)));
-        return codeRepository
-                .findAllByCodeTypeId(id)
-                .stream()
-                .map(codeMapper::toCodeDetail)
-                .collect(Collectors.toList());
-    }
 
     @Override
-    public List<CodeDetail> getCodeDetailsByType(String code) {
-        log.info(MessageResource.getMessage(ESLog.ES_029), code);
-        CodeType codeType = codeTypeRepository.findByCode(code)
-                .orElseThrow(() ->
-                        new NotFoundException(MessageResource.getMessage(ESFault.ES_009)));
-        return getCodeDetailsByType(codeType.getId());
-    }
-
-    @Override
-    public CodeDetail createCode(CodeDetail codeDetail) {
-        log.info(MessageResource.getMessage(ESLog.ES_030), codeDetail.getCode(), codeDetail.getCodeTypeId());
-        codeTypeRepository.findById(codeDetail.getCodeTypeId())
+    public CodeModel createCode(CodeReqModel codeReqModel) {
+        log.info(MessageResource.getMessage(ESLog.ES_030), codeReqModel.getCode(), codeReqModel.getCodeTypeId());
+        codeTypeRepository.findById(codeReqModel.getCodeTypeId())
                 .orElseThrow(() ->
                         new NotFoundException(MessageResource.getMessage(ESFault.ES_009)));
         return codeMapper
-                .toCodeDetail(
+                .convertCodeToCodeModel(
                         codeRepository
                                 .save(
                                         codeMapper
-                                                .toCode(codeDetail)));
+                                                .convertCodeReqModelToCode(codeReqModel)));
     }
 
     @Override
-    public CodeDetail updateCode(Long id, CodeDetail codeDetail) {
-        log.info(MessageResource.getMessage(ESLog.ES_031), id, codeDetail.getCode());
+    public CodeModel updateCode(Long id, CodeReqModel codeReqModel) {
+        log.info(MessageResource.getMessage(ESLog.ES_031), id, codeReqModel.getCode());
         Code code = codeRepository.findById(id)
                 .orElseThrow(() ->
                         new NotFoundException(MessageResource.getMessage(ESFault.ES_010)));
-        code.setCode(codeDetail.getCode());
-        code.setName(codeDetail.getName());
-        code.setDescription(codeDetail.getDescription());
+        code.setCode(codeReqModel.getCode());
+        code.setName(codeReqModel.getName());
+        code.setDescription(codeReqModel.getDescription());
         return codeMapper
-                .toCodeDetail(
+                .convertCodeToCodeModel(
                         codeRepository
                                 .save(code));
     }
 
     @Override
-    public Page<CodeDetail> searchCodeDetails(String searchTerm, int pageIndex, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
-        Page<Code> codes = codeRepository.findByNameContainingIgnoreCase(searchTerm, pageRequest);
-        List<CodeDetail> codeDetails = codes.getContent().stream().map(codeMapper::toCodeDetail).toList();
-        return new PageImpl<>(codeDetails, pageRequest, codes.getTotalElements());
+    public Boolean deleteCode(Long id) {
+        log.info(MessageResource.getMessage(ESLog.ES_032), id);
+        Code code = codeRepository.findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_010)));
+        codeRepository.delete(code);
+        return true;
     }
 
     @Override
-    public Page<CodeDetail> searchCodeDetailsByType(Long id, String searchTerm, int pageIndex, int pageSize) {
+    public List<CodeModel> getCodeDetailsByTypeId(Long id) {
+        log.info(MessageResource.getMessage(ESLog.ES_029), id);
+        codeTypeRepository.findById(id)
+                .orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_009)));
+        return codeRepository
+                .findAllByCodeTypeIdOrderByUpdatedDateDesc(id)
+                .stream()
+                .map(codeMapper::convertCodeToCodeModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CodeModel> getCodeDetailsByTypeCode(String code) {
+        log.info(MessageResource.getMessage(ESLog.ES_029), code);
+        CodeType codeType = codeTypeRepository.findByCode(code)
+                .orElseThrow(() ->
+                        new NotFoundException(MessageResource.getMessage(ESFault.ES_009)));
+        return getCodeDetailsByTypeId(codeType.getId());
+    }
+
+
+    @Override
+    public Page<CodeModel> searchCodeDetails(String searchTerm, int pageIndex, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<Code> codes = codeRepository.findByNameContainingIgnoreCaseOrderByUpdatedDateDesc(searchTerm, pageRequest);
+        List<CodeModel> codeModels = codes.getContent().stream().map(codeMapper::convertCodeToCodeModel).toList();
+        return new PageImpl<>(codeModels, pageRequest, codes.getTotalElements());
+    }
+
+    @Override
+    public Page<CodeModel> searchCodeDetailsByTypeId(Long id, String searchTerm, int pageIndex, int pageSize) {
         codeTypeRepository.findById(id)
                 .orElseThrow(() ->
                         new NotFoundException(MessageResource.getMessage(ESFault.ES_009)));
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
-        Page<Code> codes = codeRepository.findByCodeTypeIdAndNameContainingIgnoreCase(id, searchTerm, pageRequest);
-        List<CodeDetail> codeDetails = codes.getContent().stream().map(codeMapper::toCodeDetail).toList();
-        return new PageImpl<>(codeDetails, pageRequest, codes.getTotalElements());
+        Page<Code> codes = codeRepository.findByCodeTypeIdAndNameContainingIgnoreCaseOrderByUpdatedDateDesc(id, searchTerm, pageRequest);
+        List<CodeModel> codeModels = codes.getContent().stream().map(codeMapper::convertCodeToCodeModel).toList();
+        return new PageImpl<>(codeModels, pageRequest, codes.getTotalElements());
     }
 
     @Override
-    public Page<CodeDetail> searchCodeDetailsByType(String code, String searchTerm, int pageIndex, int pageSize) {
+    public Page<CodeModel> searchCodeDetailsByTypeCode(String code, String searchTerm, int pageIndex, int pageSize) {
         CodeType codeType = codeTypeRepository.findByCode(code)
                 .orElseThrow(() ->
                         new NotFoundException(MessageResource.getMessage(ESFault.ES_009)));
-        return searchCodeDetailsByType(codeType.getId(), searchTerm, pageIndex, pageSize);
+        return searchCodeDetailsByTypeId(codeType.getId(), searchTerm, pageIndex, pageSize);
     }
 
-    @Override
-    public void deleteCode(Long id) {
-        log.info(MessageResource.getMessage(ESLog.ES_032), id);
-        codeRepository.deleteById(id);
-    }
 }

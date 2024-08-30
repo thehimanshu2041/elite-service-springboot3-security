@@ -1,23 +1,24 @@
 package com.elite.service.config;
 
-import com.elite.model.config.CodeTypeDetail;
+import com.elite.model.config.CodeTypeModel;
+import com.elite.model.config.CodeTypeReqModel;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface CodeTypeService {
 
-    List<CodeTypeDetail> getCodeTypeDetails();
+    List<CodeTypeModel> getCodeTypeDetails();
 
-    Page<CodeTypeDetail> searchCodeTypeDetails(String searchTerm, int pageIndex, int pageSize);
+    CodeTypeModel getCodeTypeById(Long id);
 
-    CodeTypeDetail getCodeType(Long id);
+    CodeTypeModel getCodeTypeByCode(String code);
 
-    CodeTypeDetail getCodeType(String code);
+    CodeTypeModel createCodeType(CodeTypeReqModel codeTypeReqModel);
 
-    CodeTypeDetail createCodeType(CodeTypeDetail codeTypeDetail);
+    CodeTypeModel updateCodeType(Long id, CodeTypeReqModel codeTypeReqModel);
 
-    CodeTypeDetail updateCodeType(Long id, CodeTypeDetail codeTypeDetail);
+    Boolean deleteCodeType(Long id);
 
-    void deleteCodeType(Long id);
+    Page<CodeTypeModel> searchCodeTypeDetails(String searchTerm, int pageIndex, int pageSize);
 }

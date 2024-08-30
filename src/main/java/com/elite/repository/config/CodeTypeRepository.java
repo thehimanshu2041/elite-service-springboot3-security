@@ -13,6 +13,6 @@ public interface CodeTypeRepository extends JpaRepository<CodeType, Long> {
 
     Optional<CodeType> findByCode(String code);
 
-    Page<CodeType> findByNameContainingIgnoreCase(String searchTerm, Pageable pageable);
+    Page<CodeType> findByNameContainingIgnoreCaseOrderByUpdatedDateDesc(String searchTerm, Pageable pageable);
 
 }

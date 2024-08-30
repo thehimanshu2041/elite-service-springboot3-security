@@ -1,19 +1,15 @@
 package com.elite.mapper.config;
 
 import com.elite.entity.config.Code;
-import com.elite.model.config.CodeDetail;
-import com.elite.model.user.UserDetail;
+import com.elite.model.config.CodeModel;
+import com.elite.model.config.CodeReqModel;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface CodeMapper {
 
-    UserDetail.Gender toUserDetailGender(Code code);
+    Code convertCodeReqModelToCode(CodeReqModel codeReqModel);
 
-    @Mapping(target = "id", ignore = true)
-    Code toCode(CodeDetail codeDetail);
-
-    CodeDetail toCodeDetail(Code code);
+    CodeModel convertCodeToCodeModel(Code code);
 
 }

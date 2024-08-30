@@ -13,22 +13,22 @@ public class Country {
     @Column(name = "country_id", insertable = false, updatable = false)
     private Long id;
 
-    @Column(name = "country_iso", nullable = false)
+    @Column(name = "country_iso", nullable = false, unique = true)
     private String isp;
 
-    @Column(name = "country_name", nullable = false)
+    @Column(name = "country_name", nullable = false, unique = true)
     private String name;
 
-    @Column(name = "country_nicename", nullable = false)
+    @Column(name = "country_nicename", nullable = false, unique = true)
     private String niceName;
 
     @Column(name = "country_iso3")
     private String iso3;
 
     @Column(name = "country_numcode")
-    private String numCode;
+    private Long numCode;
 
-    @Column(name = "country_phonecode", nullable = false)
+    @Column(name = "country_phonecode", nullable = false, unique = true)
     private Long phoneCode;
 
     public Long getId() {
@@ -71,11 +71,11 @@ public class Country {
         this.iso3 = iso3;
     }
 
-    public String getNumCode() {
+    public Long getNumCode() {
         return numCode;
     }
 
-    public void setNumCode(String numCode) {
+    public void setNumCode(Long numCode) {
         this.numCode = numCode;
     }
 
